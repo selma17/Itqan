@@ -1,0 +1,20 @@
+# Builds
+android/app/build/
+android/build/
+android/.gradle/
+android/app/.cxx/
+
+# Node modules (CRUCIAL !)
+node_modules/
+
+# Caches
+.expo/
+.expo-shared/
+.gradle/
+node_modules/.cache/
+
+# Fichiers inutiles
+*.log
+.DS_Store
+.vscode/
+.idea/
