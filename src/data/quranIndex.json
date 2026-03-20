@@ -1,0 +1,1166 @@
+{
+  "surahs": [
+    {
+      "sura_no": 1,
+      "sura_name_ar": "الفَاتِحة",
+      "sura_name_en": "Al-Fātiḥah",
+      "type": "meccan",
+      "first_page": 1
+    },
+    {
+      "sura_no": 2,
+      "sura_name_ar": "البَقَرَة",
+      "sura_name_en": "Al-Baqarah",
+      "type": "medinan",
+      "first_page": 2
+    },
+    {
+      "sura_no": 3,
+      "sura_name_ar": "آل عِمران",
+      "sura_name_en": "Āl-‘Imrān",
+      "type": "medinan",
+      "first_page": 50
+    },
+    {
+      "sura_no": 4,
+      "sura_name_ar": "النِّسَاء",
+      "sura_name_en": "An-Nisā’",
+      "type": "medinan",
+      "first_page": 77
+    },
+    {
+      "sura_no": 5,
+      "sura_name_ar": "المَائدة",
+      "sura_name_en": "Al-Mā’idah",
+      "type": "medinan",
+      "first_page": 106
+    },
+    {
+      "sura_no": 6,
+      "sura_name_ar": "الأنعَام",
+      "sura_name_en": "Al-An‘ām",
+      "type": "meccan",
+      "first_page": 128
+    },
+    {
+      "sura_no": 7,
+      "sura_name_ar": "الأعرَاف",
+      "sura_name_en": "Al-A‘rāf",
+      "type": "meccan",
+      "first_page": 151
+    },
+    {
+      "sura_no": 8,
+      "sura_name_ar": "الأنفَال",
+      "sura_name_en": "Al-Anfāl",
+      "type": "medinan",
+      "first_page": 177
+    },
+    {
+      "sura_no": 9,
+      "sura_name_ar": "التوبَة",
+      "sura_name_en": "At-Taubah",
+      "type": "medinan",
+      "first_page": 187
+    },
+    {
+      "sura_no": 10,
+      "sura_name_ar": "يُونس",
+      "sura_name_en": "Yūnus",
+      "type": "meccan",
+      "first_page": 208
+    },
+    {
+      "sura_no": 11,
+      "sura_name_ar": "هُود",
+      "sura_name_en": "Hūd",
+      "type": "meccan",
+      "first_page": 221
+    },
+    {
+      "sura_no": 12,
+      "sura_name_ar": "يُوسُف",
+      "sura_name_en": "Yūsuf",
+      "type": "meccan",
+      "first_page": 235
+    },
+    {
+      "sura_no": 13,
+      "sura_name_ar": "الرَّعد",
+      "sura_name_en": "Ar-Ra‘d",
+      "type": "medinan",
+      "first_page": 249
+    },
+    {
+      "sura_no": 14,
+      "sura_name_ar": "إبراهِيم",
+      "sura_name_en": "Ibrāhīm",
+      "type": "meccan",
+      "first_page": 255
+    },
+    {
+      "sura_no": 15,
+      "sura_name_ar": "الحِجر",
+      "sura_name_en": "Al-Ḥijr",
+      "type": "meccan",
+      "first_page": 262
+    },
+    {
+      "sura_no": 16,
+      "sura_name_ar": "النَّحل",
+      "sura_name_en": "An-Naḥl",
+      "type": "meccan",
+      "first_page": 267
+    },
+    {
+      "sura_no": 17,
+      "sura_name_ar": "الإسرَاء",
+      "sura_name_en": "Al-Isrā’",
+      "type": "meccan",
+      "first_page": 282
+    },
+    {
+      "sura_no": 18,
+      "sura_name_ar": "الكَهف",
+      "sura_name_en": "Al-Kahf",
+      "type": "meccan",
+      "first_page": 293
+    },
+    {
+      "sura_no": 19,
+      "sura_name_ar": "مَريَم",
+      "sura_name_en": "Maryam",
+      "type": "meccan",
+      "first_page": 305
+    },
+    {
+      "sura_no": 20,
+      "sura_name_ar": "طه",
+      "sura_name_en": "Ṭā-Hā",
+      "type": "meccan",
+      "first_page": 312
+    },
+    {
+      "sura_no": 21,
+      "sura_name_ar": "الأنبيَاء",
+      "sura_name_en": "Al-Anbiyā’",
+      "type": "meccan",
+      "first_page": 322
+    },
+    {
+      "sura_no": 22,
+      "sura_name_ar": "الحج",
+      "sura_name_en": "Al-Ḥajj",
+      "type": "medinan",
+      "first_page": 332
+    },
+    {
+      "sura_no": 23,
+      "sura_name_ar": "المؤمنُون",
+      "sura_name_en": "Al-Mu’minūn",
+      "type": "meccan",
+      "first_page": 342
+    },
+    {
+      "sura_no": 24,
+      "sura_name_ar": "النور",
+      "sura_name_en": "An-Nūr",
+      "type": "medinan",
+      "first_page": 350
+    },
+    {
+      "sura_no": 25,
+      "sura_name_ar": "الفُرقَان",
+      "sura_name_en": "Al-Furqān",
+      "type": "meccan",
+      "first_page": 359
+    },
+    {
+      "sura_no": 26,
+      "sura_name_ar": "الشعراء",
+      "sura_name_en": "Ash-Shu‘arā’",
+      "type": "meccan",
+      "first_page": 367
+    },
+    {
+      "sura_no": 27,
+      "sura_name_ar": "النَّمل",
+      "sura_name_en": "An-Naml",
+      "type": "meccan",
+      "first_page": 377
+    },
+    {
+      "sura_no": 28,
+      "sura_name_ar": "القَصَص",
+      "sura_name_en": "Al-Qaṣaṣ",
+      "type": "meccan",
+      "first_page": 385
+    },
+    {
+      "sura_no": 29,
+      "sura_name_ar": "العَنكبُوت",
+      "sura_name_en": "Al-‘Ankabūt",
+      "type": "meccan",
+      "first_page": 396
+    },
+    {
+      "sura_no": 30,
+      "sura_name_ar": "الرُّوم",
+      "sura_name_en": "Ar-Rūm",
+      "type": "meccan",
+      "first_page": 404
+    },
+    {
+      "sura_no": 31,
+      "sura_name_ar": "لُقمَان",
+      "sura_name_en": "Luqmān",
+      "type": "meccan",
+      "first_page": 411
+    },
+    {
+      "sura_no": 32,
+      "sura_name_ar": "السَّجدة",
+      "sura_name_en": "As-Sajdah",
+      "type": "meccan",
+      "first_page": 415
+    },
+    {
+      "sura_no": 33,
+      "sura_name_ar": "الأحزَاب",
+      "sura_name_en": "Al-Aḥzāb",
+      "type": "medinan",
+      "first_page": 418
+    },
+    {
+      "sura_no": 34,
+      "sura_name_ar": "سَبإ",
+      "sura_name_en": "Saba’",
+      "type": "meccan",
+      "first_page": 428
+    },
+    {
+      "sura_no": 35,
+      "sura_name_ar": "فَاطِر",
+      "sura_name_en": "Fāṭir",
+      "type": "meccan",
+      "first_page": 434
+    },
+    {
+      "sura_no": 36,
+      "sura_name_ar": "يسٓ",
+      "sura_name_en": "Yā-Sīn",
+      "type": "meccan",
+      "first_page": 440
+    },
+    {
+      "sura_no": 37,
+      "sura_name_ar": "الصَّافَات",
+      "sura_name_en": "Aṣ-Ṣāffāt",
+      "type": "meccan",
+      "first_page": 446
+    },
+    {
+      "sura_no": 38,
+      "sura_name_ar": "صٓ",
+      "sura_name_en": "Ṣād",
+      "type": "meccan",
+      "first_page": 453
+    },
+    {
+      "sura_no": 39,
+      "sura_name_ar": "الزُّمَر",
+      "sura_name_en": "Az-Zumar",
+      "type": "meccan",
+      "first_page": 458
+    },
+    {
+      "sura_no": 40,
+      "sura_name_ar": "غَافِر",
+      "sura_name_en": "Ghāfir",
+      "type": "meccan",
+      "first_page": 467
+    },
+    {
+      "sura_no": 41,
+      "sura_name_ar": "فُصِّلَت",
+      "sura_name_en": "Fuṣṣilat",
+      "type": "meccan",
+      "first_page": 477
+    },
+    {
+      "sura_no": 42,
+      "sura_name_ar": "الشُّوري",
+      "sura_name_en": "Ash-Shūra",
+      "type": "meccan",
+      "first_page": 483
+    },
+    {
+      "sura_no": 43,
+      "sura_name_ar": "الزُّخرُف",
+      "sura_name_en": "Az-Zukhruf",
+      "type": "meccan",
+      "first_page": 489
+    },
+    {
+      "sura_no": 44,
+      "sura_name_ar": "الدُّخان",
+      "sura_name_en": "Ad-Dukhān",
+      "type": "meccan",
+      "first_page": 496
+    },
+    {
+      "sura_no": 45,
+      "sura_name_ar": "الجاثِية",
+      "sura_name_en": "Al-Jāthiyah",
+      "type": "meccan",
+      "first_page": 499
+    },
+    {
+      "sura_no": 46,
+      "sura_name_ar": "الأحقَاف",
+      "sura_name_en": "Al-Aḥqāf",
+      "type": "meccan",
+      "first_page": 502
+    },
+    {
+      "sura_no": 47,
+      "sura_name_ar": "مُحمد",
+      "sura_name_en": "Muḥammad",
+      "type": "medinan",
+      "first_page": 507
+    },
+    {
+      "sura_no": 48,
+      "sura_name_ar": "الفَتح",
+      "sura_name_en": "Al-Fatḥ",
+      "type": "medinan",
+      "first_page": 511
+    },
+    {
+      "sura_no": 49,
+      "sura_name_ar": "الحُجُرَات",
+      "sura_name_en": "Al-Ḥujurāt",
+      "type": "medinan",
+      "first_page": 515
+    },
+    {
+      "sura_no": 50,
+      "sura_name_ar": "قٓ",
+      "sura_name_en": "Qāf",
+      "type": "meccan",
+      "first_page": 518
+    },
+    {
+      "sura_no": 51,
+      "sura_name_ar": "الذَّاريَات",
+      "sura_name_en": "Adh-Dhāriyāt",
+      "type": "meccan",
+      "first_page": 520
+    },
+    {
+      "sura_no": 52,
+      "sura_name_ar": "الطُّور",
+      "sura_name_en": "Aṭ-Ṭūr",
+      "type": "meccan",
+      "first_page": 523
+    },
+    {
+      "sura_no": 53,
+      "sura_name_ar": "النَّجم",
+      "sura_name_en": "An-Najm",
+      "type": "meccan",
+      "first_page": 526
+    },
+    {
+      "sura_no": 54,
+      "sura_name_ar": "القَمَر",
+      "sura_name_en": "Al-Qamar",
+      "type": "meccan",
+      "first_page": 528
+    },
+    {
+      "sura_no": 55,
+      "sura_name_ar": "الرَّحمٰن",
+      "sura_name_en": "Ar-Raḥmān",
+      "type": "meccan",
+      "first_page": 531
+    },
+    {
+      "sura_no": 56,
+      "sura_name_ar": "الوَاقِعة",
+      "sura_name_en": "Al-Wāqi‘ah",
+      "type": "meccan",
+      "first_page": 534
+    },
+    {
+      "sura_no": 57,
+      "sura_name_ar": "الحدِيد",
+      "sura_name_en": "Al-Ḥadīd",
+      "type": "medinan",
+      "first_page": 537
+    },
+    {
+      "sura_no": 58,
+      "sura_name_ar": "المُجَادلة",
+      "sura_name_en": "Al-Mujādilah",
+      "type": "medinan",
+      "first_page": 542
+    },
+    {
+      "sura_no": 59,
+      "sura_name_ar": "الحَشر",
+      "sura_name_en": "Al-Ḥashr",
+      "type": "medinan",
+      "first_page": 545
+    },
+    {
+      "sura_no": 60,
+      "sura_name_ar": "المُمتَحنَة",
+      "sura_name_en": "Al-Mumtaḥanah",
+      "type": "medinan",
+      "first_page": 549
+    },
+    {
+      "sura_no": 61,
+      "sura_name_ar": "الصَّف",
+      "sura_name_en": "Aṣ-Ṣaff",
+      "type": "medinan",
+      "first_page": 551
+    },
+    {
+      "sura_no": 62,
+      "sura_name_ar": "الجُمعَة",
+      "sura_name_en": "Al-Jumu‘ah",
+      "type": "medinan",
+      "first_page": 553
+    },
+    {
+      "sura_no": 63,
+      "sura_name_ar": "المُنَافِقُونَ",
+      "sura_name_en": "Al-Munāfiqūn",
+      "type": "medinan",
+      "first_page": 554
+    },
+    {
+      "sura_no": 64,
+      "sura_name_ar": "التغَابُن",
+      "sura_name_en": "At-Taghābun",
+      "type": "medinan",
+      "first_page": 556
+    },
+    {
+      "sura_no": 65,
+      "sura_name_ar": "الطَّلَاق",
+      "sura_name_en": "Aṭ-Ṭalāq",
+      "type": "medinan",
+      "first_page": 558
+    },
+    {
+      "sura_no": 66,
+      "sura_name_ar": "التَّحرِيم",
+      "sura_name_en": "At-Taḥrīm",
+      "type": "medinan",
+      "first_page": 560
+    },
+    {
+      "sura_no": 67,
+      "sura_name_ar": "المُلك",
+      "sura_name_en": "Al-Mulk",
+      "type": "meccan",
+      "first_page": 562
+    },
+    {
+      "sura_no": 68,
+      "sura_name_ar": "القَلَم",
+      "sura_name_en": "Al-Qalam",
+      "type": "meccan",
+      "first_page": 564
+    },
+    {
+      "sura_no": 69,
+      "sura_name_ar": "الحَاقة",
+      "sura_name_en": "Al-Ḥāqqah",
+      "type": "meccan",
+      "first_page": 566
+    },
+    {
+      "sura_no": 70,
+      "sura_name_ar": "المَعَارج",
+      "sura_name_en": "Al-Ma‘ārij",
+      "type": "meccan",
+      "first_page": 568
+    },
+    {
+      "sura_no": 71,
+      "sura_name_ar": "نُوح",
+      "sura_name_en": "Nūḥ",
+      "type": "meccan",
+      "first_page": 570
+    },
+    {
+      "sura_no": 72,
+      "sura_name_ar": "الجِن",
+      "sura_name_en": "Al-Jinn",
+      "type": "meccan",
+      "first_page": 572
+    },
+    {
+      "sura_no": 73,
+      "sura_name_ar": "المُزمل",
+      "sura_name_en": "Al-Muzzammil",
+      "type": "meccan",
+      "first_page": 574
+    },
+    {
+      "sura_no": 74,
+      "sura_name_ar": "المُدثر",
+      "sura_name_en": "Al-Muddaththir",
+      "type": "meccan",
+      "first_page": 575
+    },
+    {
+      "sura_no": 75,
+      "sura_name_ar": "القِيَامة",
+      "sura_name_en": "Al-Qiyāmah",
+      "type": "meccan",
+      "first_page": 577
+    },
+    {
+      "sura_no": 76,
+      "sura_name_ar": "الإنسَان",
+      "sura_name_en": "Al-Insān",
+      "type": "medinan",
+      "first_page": 578
+    },
+    {
+      "sura_no": 77,
+      "sura_name_ar": "المُرسَلات",
+      "sura_name_en": "Al-Mursalāt",
+      "type": "meccan",
+      "first_page": 580
+    },
+    {
+      "sura_no": 78,
+      "sura_name_ar": "النَّبَإ",
+      "sura_name_en": "An-Naba’",
+      "type": "meccan",
+      "first_page": 582
+    },
+    {
+      "sura_no": 79,
+      "sura_name_ar": "النَّازعَات",
+      "sura_name_en": "An-Nāzi‘āt",
+      "type": "meccan",
+      "first_page": 583
+    },
+    {
+      "sura_no": 80,
+      "sura_name_ar": "عَبَسَ",
+      "sura_name_en": "‘Abasa",
+      "type": "meccan",
+      "first_page": 585
+    },
+    {
+      "sura_no": 81,
+      "sura_name_ar": "التَّكوير",
+      "sura_name_en": "At-Takwīr",
+      "type": "meccan",
+      "first_page": 586
+    },
+    {
+      "sura_no": 82,
+      "sura_name_ar": "الانفِطَار",
+      "sura_name_en": "Al-Infiṭār",
+      "type": "meccan",
+      "first_page": 587
+    },
+    {
+      "sura_no": 83,
+      "sura_name_ar": "المُطَففين",
+      "sura_name_en": "Al-Muṭaffifīn",
+      "type": "meccan",
+      "first_page": 587
+    },
+    {
+      "sura_no": 84,
+      "sura_name_ar": "الانشِقَاق",
+      "sura_name_en": "Al-Inshiqāq",
+      "type": "meccan",
+      "first_page": 589
+    },
+    {
+      "sura_no": 85,
+      "sura_name_ar": "البُرُوج",
+      "sura_name_en": "Al-Burūj",
+      "type": "meccan",
+      "first_page": 590
+    },
+    {
+      "sura_no": 86,
+      "sura_name_ar": "الطَّارق",
+      "sura_name_en": "Aṭ-Ṭāriq",
+      "type": "meccan",
+      "first_page": 591
+    },
+    {
+      "sura_no": 87,
+      "sura_name_ar": "الأعلى",
+      "sura_name_en": "Al-A‘lā",
+      "type": "meccan",
+      "first_page": 591
+    },
+    {
+      "sura_no": 88,
+      "sura_name_ar": "الغَاشِية",
+      "sura_name_en": "Al-Ghāshiyah",
+      "type": "meccan",
+      "first_page": 592
+    },
+    {
+      "sura_no": 89,
+      "sura_name_ar": "الفَجر",
+      "sura_name_en": "Al-Fajr",
+      "type": "meccan",
+      "first_page": 593
+    },
+    {
+      "sura_no": 90,
+      "sura_name_ar": "البَلَد",
+      "sura_name_en": "Al-Balad",
+      "type": "meccan",
+      "first_page": 594
+    },
+    {
+      "sura_no": 91,
+      "sura_name_ar": "الشَّمس",
+      "sura_name_en": "Ash-Shams",
+      "type": "meccan",
+      "first_page": 595
+    },
+    {
+      "sura_no": 92,
+      "sura_name_ar": "اللَّيل",
+      "sura_name_en": "Al-Lail",
+      "type": "meccan",
+      "first_page": 595
+    },
+    {
+      "sura_no": 93,
+      "sura_name_ar": "الضُّحى",
+      "sura_name_en": "Aḍ-Ḍuḥā",
+      "type": "meccan",
+      "first_page": 596
+    },
+    {
+      "sura_no": 94,
+      "sura_name_ar": "الشَّرح",
+      "sura_name_en": "Ash-Sharḥ",
+      "type": "meccan",
+      "first_page": 596
+    },
+    {
+      "sura_no": 95,
+      "sura_name_ar": "التِّين",
+      "sura_name_en": "At-Tīn",
+      "type": "meccan",
+      "first_page": 597
+    },
+    {
+      "sura_no": 96,
+      "sura_name_ar": "العَلَق",
+      "sura_name_en": "Al-‘Alaq",
+      "type": "meccan",
+      "first_page": 597
+    },
+    {
+      "sura_no": 97,
+      "sura_name_ar": "القَدر",
+      "sura_name_en": "Al-Qadr",
+      "type": "meccan",
+      "first_page": 598
+    },
+    {
+      "sura_no": 98,
+      "sura_name_ar": "البَينَة",
+      "sura_name_en": "Al-Bayyinah",
+      "type": "medinan",
+      "first_page": 598
+    },
+    {
+      "sura_no": 99,
+      "sura_name_ar": "الزَّلزَلة",
+      "sura_name_en": "Az-Zalzalah",
+      "type": "meccan",
+      "first_page": 599
+    },
+    {
+      "sura_no": 100,
+      "sura_name_ar": "العَاديَات",
+      "sura_name_en": "Al-‘Ādiyāt",
+      "type": "meccan",
+      "first_page": 599
+    },
+    {
+      "sura_no": 101,
+      "sura_name_ar": "القَارعَة",
+      "sura_name_en": "Al-Qāri‘ah",
+      "type": "meccan",
+      "first_page": 600
+    },
+    {
+      "sura_no": 102,
+      "sura_name_ar": "التَّكاثُر",
+      "sura_name_en": "At-Takāthur",
+      "type": "meccan",
+      "first_page": 600
+    },
+    {
+      "sura_no": 103,
+      "sura_name_ar": "العَصر",
+      "sura_name_en": "Al-‘Aṣr",
+      "type": "meccan",
+      "first_page": 601
+    },
+    {
+      "sura_no": 104,
+      "sura_name_ar": "الهُمَزة",
+      "sura_name_en": "Al-Humazah",
+      "type": "meccan",
+      "first_page": 601
+    },
+    {
+      "sura_no": 105,
+      "sura_name_ar": "الفِيل",
+      "sura_name_en": "Al-Fīl",
+      "type": "meccan",
+      "first_page": 601
+    },
+    {
+      "sura_no": 106,
+      "sura_name_ar": "قُرَيش",
+      "sura_name_en": "Quraish",
+      "type": "meccan",
+      "first_page": 602
+    },
+    {
+      "sura_no": 107,
+      "sura_name_ar": "المَاعُون",
+      "sura_name_en": "Al-Mā‘ūn",
+      "type": "meccan",
+      "first_page": 602
+    },
+    {
+      "sura_no": 108,
+      "sura_name_ar": "الكَوثر",
+      "sura_name_en": "Al-Kauthar",
+      "type": "meccan",
+      "first_page": 602
+    },
+    {
+      "sura_no": 109,
+      "sura_name_ar": "الكافِرون",
+      "sura_name_en": "Al-Kāfirūn",
+      "type": "meccan",
+      "first_page": 603
+    },
+    {
+      "sura_no": 110,
+      "sura_name_ar": "النَّصر",
+      "sura_name_en": "An-Naṣr",
+      "type": "medinan",
+      "first_page": 603
+    },
+    {
+      "sura_no": 111,
+      "sura_name_ar": "المَسَد",
+      "sura_name_en": "Al-Masad",
+      "type": "meccan",
+      "first_page": 603
+    },
+    {
+      "sura_no": 112,
+      "sura_name_ar": "الإخلَاص",
+      "sura_name_en": "Al-Ikhlāṣ",
+      "type": "meccan",
+      "first_page": 604
+    },
+    {
+      "sura_no": 113,
+      "sura_name_ar": "الفَلَق",
+      "sura_name_en": "Al-Falaq",
+      "type": "meccan",
+      "first_page": 604
+    },
+    {
+      "sura_no": 114,
+      "sura_name_ar": "النَّاس",
+      "sura_name_en": "An-Nās",
+      "type": "meccan",
+      "first_page": 604
+    }
+  ],
+  "juzs": [
+    {
+      "juz_number": 1,
+      "first_page": 1
+    },
+    {
+      "juz_number": 2,
+      "first_page": 22
+    },
+    {
+      "juz_number": 3,
+      "first_page": 42
+    },
+    {
+      "juz_number": 4,
+      "first_page": 62
+    },
+    {
+      "juz_number": 5,
+      "first_page": 82
+    },
+    {
+      "juz_number": 6,
+      "first_page": 102
+    },
+    {
+      "juz_number": 7,
+      "first_page": 121
+    },
+    {
+      "juz_number": 8,
+      "first_page": 142
+    },
+    {
+      "juz_number": 9,
+      "first_page": 162
+    },
+    {
+      "juz_number": 10,
+      "first_page": 182
+    },
+    {
+      "juz_number": 11,
+      "first_page": 201
+    },
+    {
+      "juz_number": 12,
+      "first_page": 222
+    },
+    {
+      "juz_number": 13,
+      "first_page": 242
+    },
+    {
+      "juz_number": 14,
+      "first_page": 262
+    },
+    {
+      "juz_number": 15,
+      "first_page": 282
+    },
+    {
+      "juz_number": 16,
+      "first_page": 302
+    },
+    {
+      "juz_number": 17,
+      "first_page": 322
+    },
+    {
+      "juz_number": 18,
+      "first_page": 342
+    },
+    {
+      "juz_number": 19,
+      "first_page": 362
+    },
+    {
+      "juz_number": 20,
+      "first_page": 382
+    },
+    {
+      "juz_number": 21,
+      "first_page": 402
+    },
+    {
+      "juz_number": 22,
+      "first_page": 422
+    },
+    {
+      "juz_number": 23,
+      "first_page": 442
+    },
+    {
+      "juz_number": 24,
+      "first_page": 462
+    },
+    {
+      "juz_number": 25,
+      "first_page": 482
+    },
+    {
+      "juz_number": 26,
+      "first_page": 502
+    },
+    {
+      "juz_number": 27,
+      "first_page": 522
+    },
+    {
+      "juz_number": 28,
+      "first_page": 542
+    },
+    {
+      "juz_number": 29,
+      "first_page": 562
+    },
+    {
+      "juz_number": 30,
+      "first_page": 582
+    }
+  ],
+  "hizbs": [
+    {
+      "hizb_number": 1,
+      "first_page": 1
+    },
+    {
+      "hizb_number": 2,
+      "first_page": 11
+    },
+    {
+      "hizb_number": 3,
+      "first_page": 22
+    },
+    {
+      "hizb_number": 4,
+      "first_page": 32
+    },
+    {
+      "hizb_number": 5,
+      "first_page": 42
+    },
+    {
+      "hizb_number": 6,
+      "first_page": 51
+    },
+    {
+      "hizb_number": 7,
+      "first_page": 62
+    },
+    {
+      "hizb_number": 8,
+      "first_page": 72
+    },
+    {
+      "hizb_number": 9,
+      "first_page": 82
+    },
+    {
+      "hizb_number": 10,
+      "first_page": 92
+    },
+    {
+      "hizb_number": 11,
+      "first_page": 102
+    },
+    {
+      "hizb_number": 12,
+      "first_page": 111
+    },
+    {
+      "hizb_number": 13,
+      "first_page": 121
+    },
+    {
+      "hizb_number": 14,
+      "first_page": 132
+    },
+    {
+      "hizb_number": 15,
+      "first_page": 142
+    },
+    {
+      "hizb_number": 16,
+      "first_page": 151
+    },
+    {
+      "hizb_number": 17,
+      "first_page": 162
+    },
+    {
+      "hizb_number": 18,
+      "first_page": 173
+    },
+    {
+      "hizb_number": 19,
+      "first_page": 182
+    },
+    {
+      "hizb_number": 20,
+      "first_page": 192
+    },
+    {
+      "hizb_number": 21,
+      "first_page": 201
+    },
+    {
+      "hizb_number": 22,
+      "first_page": 212
+    },
+    {
+      "hizb_number": 23,
+      "first_page": 222
+    },
+    {
+      "hizb_number": 24,
+      "first_page": 231
+    },
+    {
+      "hizb_number": 25,
+      "first_page": 242
+    },
+    {
+      "hizb_number": 26,
+      "first_page": 252
+    },
+    {
+      "hizb_number": 27,
+      "first_page": 262
+    },
+    {
+      "hizb_number": 28,
+      "first_page": 272
+    },
+    {
+      "hizb_number": 29,
+      "first_page": 282
+    },
+    {
+      "hizb_number": 30,
+      "first_page": 292
+    },
+    {
+      "hizb_number": 31,
+      "first_page": 302
+    },
+    {
+      "hizb_number": 32,
+      "first_page": 312
+    },
+    {
+      "hizb_number": 33,
+      "first_page": 322
+    },
+    {
+      "hizb_number": 34,
+      "first_page": 332
+    },
+    {
+      "hizb_number": 35,
+      "first_page": 342
+    },
+    {
+      "hizb_number": 36,
+      "first_page": 352
+    },
+    {
+      "hizb_number": 37,
+      "first_page": 362
+    },
+    {
+      "hizb_number": 38,
+      "first_page": 372
+    },
+    {
+      "hizb_number": 39,
+      "first_page": 382
+    },
+    {
+      "hizb_number": 40,
+      "first_page": 392
+    },
+    {
+      "hizb_number": 41,
+      "first_page": 402
+    },
+    {
+      "hizb_number": 42,
+      "first_page": 413
+    },
+    {
+      "hizb_number": 43,
+      "first_page": 422
+    },
+    {
+      "hizb_number": 44,
+      "first_page": 431
+    },
+    {
+      "hizb_number": 45,
+      "first_page": 442
+    },
+    {
+      "hizb_number": 46,
+      "first_page": 451
+    },
+    {
+      "hizb_number": 47,
+      "first_page": 462
+    },
+    {
+      "hizb_number": 48,
+      "first_page": 472
+    },
+    {
+      "hizb_number": 49,
+      "first_page": 482
+    },
+    {
+      "hizb_number": 50,
+      "first_page": 491
+    },
+    {
+      "hizb_number": 51,
+      "first_page": 502
+    },
+    {
+      "hizb_number": 52,
+      "first_page": 513
+    },
+    {
+      "hizb_number": 53,
+      "first_page": 522
+    },
+    {
+      "hizb_number": 54,
+      "first_page": 531
+    },
+    {
+      "hizb_number": 55,
+      "first_page": 542
+    },
+    {
+      "hizb_number": 56,
+      "first_page": 553
+    },
+    {
+      "hizb_number": 57,
+      "first_page": 562
+    },
+    {
+      "hizb_number": 58,
+      "first_page": 572
+    },
+    {
+      "hizb_number": 59,
+      "first_page": 582
+    },
+    {
+      "hizb_number": 60,
+      "first_page": 591
+    }
+  ]
+}
