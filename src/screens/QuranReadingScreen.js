@@ -1,295 +1,255 @@
-import React, { useState, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  Modal,
-  TextInput,
-  Dimensions,
-  StatusBar,
-  ActivityIndicator,
+  View, Text, StyleSheet, TouchableOpacity,
+  FlatList, Modal, TextInput, Dimensions,
+  StatusBar, Animated, TouchableWithoutFeedback,
+  Image, ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFonts } from 'expo-font';
-
-import {
-  QURAN_PAGES,
-  SURAH_INDEX,
-  JUZ_INDEX,
-  BISMILLAH,
-} from '../data/quranPages';
-
 import colors from '../styles/colors';
+import quranImages from '../data/quranImagesIndex';
+import navIndex from '../data/quranIndex.json';
+import qaloonData from '../data/qaloonQuran.json';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFonts, ScheherazadeNew_400Regular } from '@expo-google-fonts/scheherazade-new';
+console.log('navIndex surahs:', navIndex?.surahs?.length);
+console.log('navIndex hizbs:', navIndex?.hizbs?.length);
+console.log('navIndex juzs:', navIndex?.juzs?.length);
 
-// ─────────────────────────────────────────────────────────────────────────────
-// POLICES
-// ─────────────────────────────────────────────────────────────────────────────
-const FONT_QURAN = 'QaloonQuran';
-const FONT_UI    = 'ScheherazadeNew';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CONSTANTES
-// ─────────────────────────────────────────────────────────────────────────────
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 
-// Palette du projet (colors.js)
 const C = {
-  bg:          colors.bgLight,       // '#f8f6f0'
-  bgPage:      colors.bgPaper,       // '#fffef9'
-  primary:     colors.primary,       // '#2d5a3e' vert
-  primaryDark: colors.primaryDark,   // '#1e3d2a'
-  gold:        colors.secondary,     // '#d4af37' or
-  text:        colors.textPrimary,   // '#1a2b1f'
-  textMuted:   colors.textSecondary, // '#4a5f54'
-  border:      colors.border,        // '#d4c4a8'
-  borderLight: colors.borderLight,   // '#e8e4d8'
-  white:       colors.textLight,     // '#ffffff'
-  ayahEnd:     '#77554B',            // couleur Flutter exacte pour fin d'ayah
+  bg:          colors.bgLight,
+  primary:     colors.primary,
+  primaryDark: colors.primaryDark,
+  gold:        colors.secondary,
+  text:        colors.textPrimary,
+  textMuted:   colors.textSecondary,
+  border:      colors.border,
+  white:       colors.textLight,
 };
 
-const FONT_SIZE_AYAH     = 22;
-const FONT_SIZE_AYAH_NUM = 25;   // +3 comme Flutter
-const LINE_HEIGHT_RATIO  = 2;
-
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPOSANT : Numéro d'ayah
-// FIX : un seul \u06DD (cercle décoratif) + le chiffre arabe
-// Le bug "deux cercles" venait du \u06DD + le chiffre arabe qui contient
-// lui-même un ornement dans certaines polices — on affiche juste le chiffre
-// ─────────────────────────────────────────────────────────────────────────────
-const AyahNumber = ({ num }) => (
-  <Text style={styles.ayahNumber}> {num} </Text>
-);
-
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPOSANT : Segment d'ayah
-// Logique Flutter : corps normal + dernière lettre en couleur ayahEnd
-// ─────────────────────────────────────────────────────────────────────────────
-const AyahSegment = ({ seg }) => {
-  const { text, is_end, aya_num } = seg;
-  if (!text) return null;
-
-  if (is_end && text.length > 0) {
-    const body     = text.slice(0, -1);
-    const lastChar = text.slice(-1);
-    return (
-      <Text>
-        <Text style={styles.ayahText}>{body}</Text>
-        <Text style={styles.ayahTextEnd}>{lastChar}</Text>
-        {aya_num ? <AyahNumber num={aya_num} /> : null}
-      </Text>
-    );
+const FONT_UI       = 'ScheherazadeNew_400Regular';
+const BOOKMARKS_KEY = '@itqan_mushaf_bookmarks';
+const getSurahName = (p) => {
+  const onThisPage = navIndex.surahs.filter(s => s.first_page === p);
+  if (onThisPage.length > 0) {
+    return onThisPage.map(s => s.sura_name_ar).join(' • ');
   }
+  return navIndex.surahs.filter(s => s.first_page <= p).pop()?.sura_name_ar || '';
+};
+const getHizbNum    = (p) => navIndex.hizbs.filter(h => h.first_page <= p).pop()?.hizb_number  || '';
 
-  return <Text style={styles.ayahText}>{text}</Text>;
+// ── Premier verset d'un hizb ──
+const getFirstVerseOfHizb = (hizbNum) => {
+  const hizbInfo = navIndex.hizbs.find(h => h.hizb_number === hizbNum);
+  if (!hizbInfo) return '';
+  const aya = qaloonData.find(a => parseInt(a.page) === hizbInfo.first_page);
+  return aya ? aya.aya_text.slice(0, 40) + '...' : '';
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPOSANT : Ligne coranique
-// ─────────────────────────────────────────────────────────────────────────────
-const QuranLine = ({ line }) => (
-  <Text style={styles.quranLine}>
-    {line.segments.map((seg, i) => (
-      <Text key={`${seg.aya_no}-${i}`}>
-        {i > 0 ? ' ' : ''}
-        <AyahSegment seg={seg} />
-      </Text>
-    ))}
-  </Text>
-);
+// ── Premier verset d'un juz ──
+const getFirstVerseOfJuz = (juzNum) => {
+  const juzInfo = navIndex.juzs.find(j => j.juz_number === juzNum);
+  if (!juzInfo) return '';
+  const aya = qaloonData.find(a => parseInt(a.page) === juzInfo.first_page);
+  return aya ? aya.aya_text.slice(0, 40) + '...' : '';
+};
 
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPOSANT : En-tête de sourate
-// ─────────────────────────────────────────────────────────────────────────────
-const SurahHeader = ({ sura, hasBismillah }) => (
-  <View style={styles.surahHeaderContainer}>
-    <View style={styles.surahBanner}>
-      <View style={styles.bannerOrnamentLeft}>
-        <Text style={styles.bannerOrnamentText}>❖</Text>
-      </View>
-      <View style={styles.bannerOrnamentRight}>
-        <Text style={styles.bannerOrnamentText}>❖</Text>
-      </View>
-      <Text style={styles.surahName}>سُورَةُ {sura.name_ar}</Text>
-    </View>
-    {hasBismillah && (
-      <Text style={styles.bismillah}>{BISMILLAH}</Text>
-    )}
-  </View>
-);
-
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPOSANT : Page du Mushaf
-// FIX responsive : flex:1 sur pageContainer + pageInner, pas de hauteur fixe
-// ─────────────────────────────────────────────────────────────────────────────
-const MushafPage = React.memo(({ data }) => {
-  const hasHeader  = data.starting_suras.length > 0;
-  const isShortPage = data.lines.length < 10;
+// ── Page du Mushaf ──
+const MushafPage = React.memo(({ pageNum, onTap, bookmarks, fontsLoaded }) => {
+  const image      = useMemo(() => quranImages[pageNum] || quranImages[String(pageNum)] || null, [pageNum]);
+  const surahName  = useMemo(() => getSurahName(pageNum), [pageNum]);
+  const hizbNum    = useMemo(() => getHizbNum(pageNum),   [pageNum]);
+  const isOdd      = pageNum % 2 !== 0;
+  const isBookmark = bookmarks.includes(pageNum);
+  const isSpecial  = pageNum === 1 || pageNum === 2;
 
   return (
-    <View style={styles.pageContainer}>
-      {/* Bordures décoratives */}
-      <View style={[styles.pageBorder, styles.pageBorderLeft]} />
-      <View style={[styles.pageBorder, styles.pageBorderRight]} />
-
-      <View style={styles.pageInner}>
-        {hasHeader && (
-          <SurahHeader
-            sura={data.starting_suras[0]}
-            hasBismillah={data.has_bismillah}
+    <TouchableWithoutFeedback onPress={onTap}>
+      <View style={styles.pageContainer}>
+        {image ? (
+          <Image
+            source={image}
+            style={[styles.pageImage, isSpecial && styles.pageImageSpecial]}
+            resizeMode="contain"
           />
+        ) : (
+          <View style={styles.pendingContainer}>
+            <Text style={styles.pendingText}>صفحة غير متوفرة</Text>
+            <Text style={styles.pendingPageNum}>{pageNum}</Text>
+          </View>
         )}
 
-        <View style={[
-          styles.linesContainer,
-          isShortPage && styles.linesContainerCentered,
-        ]}>
-          {data.lines.map(line => (
-            <QuranLine key={line.line} line={line} />
-          ))}
+        {/* Signet décoratif */}
+        <View style={[styles.signet, isOdd ? styles.signetRight : styles.signetLeft]}>
+          <View style={styles.signetBody} />
+          <View style={styles.signetTip} />
         </View>
 
-        {/* Numéro de page */}
-        <Text style={styles.pageNumber}>{data.page}</Text>
+        {/* Marque-page actif */}
+        {isBookmark && (
+          <View style={[styles.bookmarkMark, isOdd ? styles.signetRight : styles.signetLeft]}>
+            <Text style={styles.bookmarkIcon}>🔖</Text>
+          </View>
+        )}
+
+        {/* Infos overlay */}
+        {fontsLoaded && (
+          <>
+            <View style={styles.surahOverlay}>
+              <Text style={styles.surahOverlayText}>{surahName}</Text>
+            </View>
+            <View style={styles.hizbOverlay}>
+              <Text style={styles.hizbOverlayText}>حزب {hizbNum}</Text>
+            </View>
+            <View style={styles.pageNumOverlay}>
+              <Text style={styles.pageNumOverlayText}>{pageNum}</Text>
+            </View>
+          </>
+        )}
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPOSANT : Drawer de navigation
-// ─────────────────────────────────────────────────────────────────────────────
-const NavDrawer = ({ visible, currentPage, onGoTo, onClose }) => {
-  const [tab, setTab]           = useState('surah');
-  const [jumpValue, setJumpValue] = useState('');
-
-  const surahList = useMemo(() =>
-    Object.entries(SURAH_INDEX)
-      .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
-      .map(([no, info]) => ({ no: parseInt(no), ...info })),
-    []
-  );
-
-  const juzList = useMemo(() =>
-    Object.entries(JUZ_INDEX)
-      .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
-      .map(([juz, page]) => ({ juz: parseInt(juz), page })),
-    []
-  );
-
-  const handleJump = () => {
-    const n = parseInt(jumpValue);
-    if (n >= 1 && n <= 604) { onGoTo(n); onClose(); }
-  };
+// ── Panneau Navigation (sourates / hizbs / juz) ──
+const NavigationPanel = ({ visible, currentPage, onGoTo, onClose }) => {
+  const [tab, setTab]       = useState('surah');
+  const [search, setSearch] = useState('');
 
   const tabs = [
-    { id: 'surah', label: 'سورة' },
-    { id: 'juz',   label: 'جزء'  },
-    { id: 'page',  label: 'صفحة' },
+    { id: 'surah', label: 'السور'    },
+    { id: 'hizb',  label: 'الأحزاب' },
+    { id: 'juz',   label: 'الأجزاء' },
   ];
 
+  const filteredSurahs = useMemo(() =>
+    navIndex.surahs.filter(s =>
+      s.sura_name_ar.includes(search) ||
+      String(s.sura_no).includes(search)
+    ), [search]);
+
+  const filteredHizbs = useMemo(() =>
+    navIndex.hizbs.filter(h => String(h.hizb_number).includes(search)),
+    [search]);
+
+  const filteredJuzs = useMemo(() =>
+    navIndex.juzs.filter(j => String(j.juz_number).includes(search)),
+    [search]);
+
+  console.log('NavigationPanel visible:', visible, 'tab:', tab);
+  console.log('filteredSurahs:', filteredSurahs?.length);
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <TouchableOpacity
-        style={styles.drawerBackdrop}
-        activeOpacity={1}
-        onPress={onClose}
-      />
-      <View style={styles.drawerContainer}>
-        <View style={styles.drawerHandle} />
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <TouchableOpacity style={styles.panelBackdrop} activeOpacity={1} onPress={onClose} />
+      <View style={styles.panelContainer}>
+        <View style={styles.panelHandle} />
+        <Text style={styles.panelTitle}>البحث في القرآن الكريم</Text>
 
         {/* Tabs */}
-        <View style={styles.drawerTabs}>
+        <View style={styles.panelTabs}>
           {tabs.map(t => (
             <TouchableOpacity
               key={t.id}
-              style={[styles.drawerTab, tab === t.id && styles.drawerTabActive]}
-              onPress={() => setTab(t.id)}
+              style={[styles.panelTab, tab === t.id && styles.panelTabActive]}
+              onPress={() => { setTab(t.id); setSearch(''); }}
             >
-              <Text style={[
-                styles.drawerTabText,
-                tab === t.id && styles.drawerTabTextActive,
-              ]}>
+              <Text style={[styles.panelTabText, tab === t.id && styles.panelTabTextActive]}>
                 {t.label}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        <View style={styles.drawerContent}>
+        {/* Barre de recherche */}
+        <View style={styles.searchBar}>
+          <Text style={styles.searchIcon}>🔍</Text>
+          <TextInput
+            style={styles.searchInput}
+            value={search}
+            onChangeText={setSearch}
+            placeholder={`البحث في ${tabs.find(t => t.id === tab)?.label}`}
+            placeholderTextColor={C.textMuted}
+            textAlign="right"
+          />
+        </View>
+
+        {/* Listes */}
+        <View style={styles.panelContent}>
+
+          {/* Sourates */}
           {tab === 'surah' && (
             <FlatList
-              data={surahList}
-              keyExtractor={item => String(item.no)}
+              data={filteredSurahs}
+              keyExtractor={item => String(item.sura_no)}
+              showsVerticalScrollIndicator={false}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={[
-                    styles.drawerItem,
-                    item.page === currentPage && styles.drawerItemActive,
-                  ]}
-                  onPress={() => { onGoTo(item.page); onClose(); }}
+                  style={[styles.surahItem, item.first_page === currentPage && styles.surahItemActive]}
+                  onPress={() => { onGoTo(item.first_page); onClose(); }}
                 >
-                  <Text style={styles.drawerItemNum}>{item.no}</Text>
-                  <Text style={[styles.drawerItemText, { fontFamily: FONT_UI }]}>
-                    سورة {item.name_ar}
-                  </Text>
-                  <Text style={styles.drawerItemPage}>ص {item.page}</Text>
+                  <View style={styles.surahItemLeft}>
+                    <Text style={styles.surahItemNum}>{item.sura_no}</Text>
+                  </View>
+                  <View style={styles.surahItemCenter}>
+                    <Text style={styles.surahItemName}>{item.sura_name_ar}</Text>
+                    <Text style={styles.surahItemMeta}>
+                      {item.type === 'meccan' ? 'مكية' : 'مدنية'} • الصفحة {item.first_page}
+                    </Text>
+                  </View>
+                  {item.first_page === currentPage && (
+                    <View style={styles.activeIndicator} />
+                  )}
                 </TouchableOpacity>
               )}
             />
           )}
 
+          {/* Hizbs */}
+          {tab === 'hizb' && (
+            <FlatList
+              data={filteredHizbs}
+              keyExtractor={item => String(item.hizb_number)}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[styles.hizbJuzItem, item.first_page === currentPage && styles.hizbJuzItemActive]}
+                  onPress={() => { onGoTo(item.first_page); onClose(); }}
+                >
+                  <Text style={styles.hizbJuzNum}>الحزب {item.hizb_number}</Text>
+                  <Text style={styles.hizbJuzVerse} numberOfLines={1}>
+                    ﴾{getFirstVerseOfHizb(item.hizb_number)}﴿
+                  </Text>
+                  {item.first_page === currentPage && (
+                    <View style={styles.activeIndicator} />
+                  )}
+                </TouchableOpacity>
+              )}
+            />
+          )}
+
+          {/* Juz */}
           {tab === 'juz' && (
             <FlatList
-              data={juzList}
-              numColumns={5}
-              keyExtractor={item => String(item.juz)}
+              data={filteredJuzs}
+              keyExtractor={item => String(item.juz_number)}
+              showsVerticalScrollIndicator={false}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={[
-                    styles.juzItem,
-                    item.page === currentPage && styles.juzItemActive,
-                  ]}
-                  onPress={() => { onGoTo(item.page); onClose(); }}
+                  style={[styles.hizbJuzItem, item.first_page === currentPage && styles.hizbJuzItemActive]}
+                  onPress={() => { onGoTo(item.first_page); onClose(); }}
                 >
-                  <Text style={[
-                    styles.juzItemText,
-                    item.page === currentPage && styles.juzItemTextActive,
-                  ]}>
-                    {item.juz}
+                  <Text style={styles.hizbJuzNum}>الجزء {item.juz_number}</Text>
+                  <Text style={styles.hizbJuzVerse} numberOfLines={1}>
+                    ﴾{getFirstVerseOfJuz(item.juz_number)}﴿
                   </Text>
-                  <Text style={styles.juzLabel}>جزء</Text>
+                  {item.first_page === currentPage && (
+                    <View style={styles.activeIndicator} />
+                  )}
                 </TouchableOpacity>
               )}
             />
-          )}
-
-          {tab === 'page' && (
-            <View style={styles.pageJumpContainer}>
-              <Text style={styles.pageJumpLabel}>انتقل إلى صفحة</Text>
-              <TextInput
-                style={styles.pageJumpInput}
-                keyboardType="number-pad"
-                value={jumpValue}
-                onChangeText={setJumpValue}
-                placeholder="1 - 604"
-                maxLength={3}
-                textAlign="center"
-              />
-              <TouchableOpacity
-                style={styles.pageJumpBtn}
-                onPress={handleJump}
-              >
-                <Text style={styles.pageJumpBtnText}>انتقل</Text>
-              </TouchableOpacity>
-            </View>
           )}
         </View>
       </View>
@@ -297,517 +257,643 @@ const NavDrawer = ({ visible, currentPage, onGoTo, onClose }) => {
   );
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ÉCRAN PRINCIPAL
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Panneau Signets ──
+const BookmarksPanel = ({ visible, bookmarks, onGoTo, onDelete, onClose }) => {
+  const [search, setSearch] = useState('');
+
+  const filtered = useMemo(() =>
+    bookmarks.filter(p => String(p).includes(search)),
+    [bookmarks, search]
+  );
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <TouchableOpacity style={styles.panelBackdrop} activeOpacity={1} onPress={onClose} />
+      <View style={styles.panelContainer}>
+        <View style={styles.panelHandle} />
+        <Text style={styles.panelTitle}>العلامات المرجعية</Text>
+
+        {/* Tabs factices comme la capture */}
+        <View style={styles.panelTabs}>
+          <View style={[styles.panelTab, styles.panelTabActive]}>
+            <Text style={[styles.panelTabText, styles.panelTabTextActive]}>الصفحات</Text>
+          </View>
+        </View>
+
+        {/* Recherche */}
+        <View style={styles.searchBar}>
+          <Text style={styles.searchIcon}>🔍</Text>
+          <TextInput
+            style={styles.searchInput}
+            value={search}
+            onChangeText={setSearch}
+            placeholder="البحث في الصفحات"
+            placeholderTextColor={C.textMuted}
+            keyboardType="number-pad"
+            textAlign="right"
+          />
+        </View>
+
+        <View style={styles.panelContent}>
+          {filtered.length === 0 ? (
+            <View style={styles.emptyBookmarks}>
+              <Text style={styles.emptyBookmarksText}>لا توجد علامات مرجعية</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={filtered}
+              keyExtractor={item => String(item)}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item: page }) => (
+                <TouchableOpacity
+                  style={styles.bookmarkItem}
+                  onPress={() => { onGoTo(page); onClose(); }}
+                >
+                  <TouchableOpacity
+                    style={styles.bookmarkDeleteBtn}
+                    onPress={() => onDelete(page)}
+                  >
+                    <Text style={styles.bookmarkDeleteIcon}>✕</Text>
+                  </TouchableOpacity>
+                  <View style={styles.bookmarkItemInfo}>
+                    <Text style={styles.bookmarkItemPage}>الصفحة {page}</Text>
+                    <Text style={styles.bookmarkItemSurah}>{getSurahName(page)}</Text>
+                  </View>
+                </TouchableOpacity>
+              )}
+            />
+          )}
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+// ── Écran principal ──
 const QuranReadingScreen = ({ navigation }) => {
+  const [fontsLoaded] = useFonts({ ScheherazadeNew_400Regular });
 
-  // ── Hooks — TOUS avant tout return conditionnel ───────────────────────────
-  const [fontsLoaded] = useFonts({
-    [FONT_QURAN]: require('../../assets/fonts/qaloon.10.ttf'),
-    // [FONT_UI]: ScheherazadeNew_400Regular,
-  });
-
-  const flatListRef = useRef(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const flatListRef                     = useRef(null);
+  const [currentPage, setCurrentPage]   = useState(1);
   const [navVisible, setNavVisible]     = useState(false);
+  const [uiVisible, setUiVisible]       = useState(false);
+  const [bookmarksVisible, setBookmarksVisible] = useState(false);
+  const fadeAnim                        = useRef(new Animated.Value(0)).current;
+  const [bookmarks, setBookmarks]       = useState([]);
+  const [toastMsg, setToastMsg]         = useState('');
+  const toastAnim                       = useRef(new Animated.Value(0)).current;
 
-  const currentSurahName = useMemo(() => {
-    for (let i = currentIndex; i >= 0; i--) {
-      if (QURAN_PAGES[i].starting_suras.length > 0) {
-        return QURAN_PAGES[i].starting_suras[0].name_ar;
+  // ── Charger les signets au démarrage ──
+  useEffect(() => {
+    AsyncStorage.getItem(BOOKMARKS_KEY).then(val => {
+      if (val) {
+        const saved = JSON.parse(val);
+        setBookmarks(saved);
+        if (saved.length > 0) {
+          const page = saved[saved.length - 1];
+          setCurrentPage(page);
+          setTimeout(() => {
+            flatListRef.current?.scrollToIndex({ index: page - 1, animated: false });
+          }, 500);
+        }
       }
+    });
+  }, []);
+
+  // ── Toast ──
+  const showToast = useCallback((msg) => {
+    setToastMsg(msg);
+    Animated.sequence([
+      Animated.timing(toastAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
+      Animated.delay(1500),
+      Animated.timing(toastAnim, { toValue: 0, duration: 300, useNativeDriver: true }),
+    ]).start();
+  }, [toastAnim]);
+
+  // ── Toggle signet ──
+  const handleToggleBookmark = useCallback(() => {
+    let newBookmarks;
+    if (bookmarks.includes(currentPage)) {
+      newBookmarks = bookmarks.filter(p => p !== currentPage);
+      showToast('تم حذف العلامة المرجعية 🗑️');
+    } else {
+      newBookmarks = [...bookmarks, currentPage];
+      showToast(`تم حفظ الصفحة ${currentPage} 🔖`);
     }
-    return '';
-  }, [currentIndex]);
+    setBookmarks(newBookmarks);
+    AsyncStorage.setItem(BOOKMARKS_KEY, JSON.stringify(newBookmarks));
+  }, [currentPage, bookmarks, showToast]);
+
+  // ── Supprimer un signet depuis le panneau ──
+  const handleDeleteBookmark = useCallback((page) => {
+    const newBookmarks = bookmarks.filter(p => p !== page);
+    setBookmarks(newBookmarks);
+    AsyncStorage.setItem(BOOKMARKS_KEY, JSON.stringify(newBookmarks));
+  }, [bookmarks]);
+
+  // ── Toggle UI ──
+  const toggleUI = useCallback(() => {
+    if (uiVisible) {
+      Animated.timing(fadeAnim, {
+        toValue: 0, duration: 250, useNativeDriver: true,
+      }).start(() => setUiVisible(false));
+    } else {
+      setUiVisible(true);
+      Animated.timing(fadeAnim, {
+        toValue: 1, duration: 250, useNativeDriver: true,
+      }).start();
+    }
+  }, [uiVisible, fadeAnim]);
+
+  const pages = useMemo(
+    () => Array.from({ length: 604 }, (_, i) => i + 1),
+    []
+  );
+
+  const surahName = useMemo(() => {
+    const surahs = navIndex.surahs.filter(s => s.first_page === currentPage);
+    if (surahs.length > 0) {
+      return surahs.map(s => s.sura_name_ar).join(' • ');
+    }
+    return navIndex.surahs.filter(s => s.first_page <= currentPage).pop()?.sura_name_ar || '';
+  }, [currentPage]);
+  const juzNum = useMemo(() =>
+    navIndex.juzs.filter(j => j.first_page <= currentPage).pop()?.juz_number || '',
+    [currentPage]
+  );
+  const hizbNum = useMemo(() =>
+    navIndex.hizbs.filter(h => h.first_page <= currentPage).pop()?.hizb_number || '',
+    [currentPage]
+  );
+
+  const isCurrentPageBookmarked = bookmarks.includes(currentPage);
 
   const goToPage = useCallback((pageNum) => {
-    const idx = QURAN_PAGES.findIndex(p => p.page === pageNum);
-    if (idx !== -1) {
-      // FIX scroll inversé : avec inverted=true les index sont miroir
-      flatListRef.current?.scrollToIndex({ index: idx, animated: false });
-      setCurrentIndex(idx);
-    }
+    flatListRef.current?.scrollToIndex({ index: pageNum - 1, animated: false });
+    setCurrentPage(pageNum);
+    setNavVisible(false);
+    setBookmarksVisible(false);
   }, []);
 
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
-      // FIX scroll inversé : avec inverted=true l'index affiché = length-1-index
-      const idx = viewableItems[0].index;
-      setCurrentIndex(QURAN_PAGES.length - 1 - idx);
+      setCurrentPage(viewableItems[0].item);
     }
   });
 
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 50 });
 
-  const renderPage = useCallback(({ item }) => (
-    <MushafPage data={item} />
-  ), []);
+  const renderPage = useCallback(({ item: pageNum }) => (
+    <MushafPage
+      pageNum={pageNum}
+      onTap={toggleUI}
+      bookmarks={bookmarks}
+      fontsLoaded={fontsLoaded}
+    />
+  ), [toggleUI, bookmarks, fontsLoaded]);
 
-  const keyExtractor = useCallback((item) => String(item.page), []);
-
+  const keyExtractor  = useCallback((item) => String(item), []);
   const getItemLayout = useCallback((_, index) => ({
-    length: SCREEN_W,
-    offset: SCREEN_W * index,
-    index,
+    length: SCREEN_W, offset: SCREEN_W * index, index,
   }), []);
 
-  // ── Return conditionnel APRÈS tous les hooks ──────────────────────────────
-  if (!fontsLoaded) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={C.gold} />
-        <Text style={styles.loadingText}>جاري التحميل...</Text>
-      </View>
-    );
-  }
-
-  const currentPage = QURAN_PAGES[currentIndex];
-
   return (
-    <SafeAreaView style={styles.screen}>
-      <StatusBar barStyle="light-content" backgroundColor={C.primaryDark} />
+    <View style={styles.screen}>
+      <StatusBar barStyle="dark-content" hidden={!uiVisible} />
 
-      {/* ── HEADER ── */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Text style={styles.backButtonText}>←</Text>
-        </TouchableOpacity>
-
-        <View style={styles.headerMeta}>
-          <View style={styles.metaBadge}>
-            <Text style={styles.metaBadgeText}>جزء {currentPage.juz}</Text>
-          </View>
-          <View style={styles.metaBadge}>
-            <Text style={styles.metaBadgeText}>حزب {currentPage.hizb}</Text>
-          </View>
-        </View>
-
-        <Text style={styles.headerSurah} numberOfLines={1}>
-          {currentSurahName}
-        </Text>
-
-        <TouchableOpacity style={styles.navButton} onPress={() => setNavVisible(true)}>
-          <Text style={styles.navButtonText}>☰</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* ── PAGES — scroll RTL inversé ── */}
-      {/*
-        FIX direction scroll :
-        - inverted={true} retourne la FlatList → le scroll va de droite à gauche
-        - Les données sont dans l'ordre normal, inverted gère le miroir
-        - initialScrollIndex pointe sur le dernier item (qui devient le 1er affiché)
-      */}
+      {/* Pages plein écran */}
       <FlatList
         ref={flatListRef}
-        data={QURAN_PAGES}
+        data={pages}
+        inverted={true}
         renderItem={renderPage}
         keyExtractor={keyExtractor}
         horizontal
         pagingEnabled
-        inverted={true}                  // ← FIX : scroll droite→gauche (RTL)
         showsHorizontalScrollIndicator={false}
         getItemLayout={getItemLayout}
-        initialScrollIndex={QURAN_PAGES.length - 1}   // commence à la page 1 (fin du tableau inversé)
+        initialScrollIndex={0}
         initialNumToRender={3}
         maxToRenderPerBatch={3}
         windowSize={5}
         removeClippedSubviews
         onViewableItemsChanged={onViewableItemsChanged.current}
         viewabilityConfig={viewabilityConfig.current}
-        style={styles.flatList}
+        style={StyleSheet.absoluteFill}
       />
 
-      {/* ── FOOTER — juste le numéro de page, pas de boutons ── */}
-      {/* FIX : supprimé les boutons suivante/précédente, le scroll suffit */}
-      <View style={styles.footer}>
-        <Text style={styles.footerPageNum}>
-          {currentPage.page} / 604
-        </Text>
-      </View>
+      {/* Header overlay */}
+      {uiVisible && (
+        <Animated.View style={[styles.header, { opacity: fadeAnim }]}>
+          <SafeAreaView edges={['top']}>
+            <View style={styles.headerInner}>
 
-      {/* ── DRAWER ── */}
-      <NavDrawer
+              {/* ← Retour */}
+              <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <Text style={styles.backButtonText}>←</Text>
+              </TouchableOpacity>
+
+              {/* Zone centrale cliquable → Navigation */}
+              <TouchableOpacity
+                style={styles.headerCenter}
+                onPress={() => setNavVisible(true)}
+              >
+                <Text style={styles.headerSurah} numberOfLines={1}>{surahName}</Text>
+                <View style={styles.headerMetaRow}>
+                  <Text style={styles.headerMetaText}>الصفحة {currentPage}</Text>
+                  <Text style={styles.headerMetaSep}>•</Text>
+                  <Text style={styles.headerMetaText}>الجزء {juzNum}</Text>
+                </View>
+              </TouchableOpacity>
+
+              {/* Signet (vide ou plein) */}
+              <TouchableOpacity style={styles.bookmarkBtn} onPress={handleToggleBookmark}>
+                <Text style={styles.bookmarkBtnIcon}>
+                  {isCurrentPageBookmarked ? '🔖' : '🏷️'}
+                </Text>
+              </TouchableOpacity>
+
+              {/* ☰ → Panneau signets */}
+              <TouchableOpacity style={styles.navButton} onPress={() => setBookmarksVisible(true)}>
+                <Text style={styles.navButtonText}>☰</Text>
+              </TouchableOpacity>
+
+            </View>
+          </SafeAreaView>
+        </Animated.View>
+      )}
+
+      {/* Toast */}
+      <Animated.View style={[styles.toast, { opacity: toastAnim }]}>
+        <Text style={styles.toastText}>{toastMsg}</Text>
+      </Animated.View>
+
+      {/* Panneau Navigation */}
+      <NavigationPanel
         visible={navVisible}
-        currentPage={currentPage.page}
+        currentPage={currentPage}
         onGoTo={goToPage}
         onClose={() => setNavVisible(false)}
       />
-    </SafeAreaView>
+
+      {/* Panneau Signets */}
+      <BookmarksPanel
+        visible={bookmarksVisible}
+        bookmarks={bookmarks}
+        onGoTo={goToPage}
+        onDelete={handleDeleteBookmark}
+        onClose={() => setBookmarksVisible(false)}
+      />
+    </View>
   );
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// STYLES
-// ─────────────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: '#f5f0e8' },
 
-  // ── Loading ──
-  loadingContainer: {
-    flex: 1,
+  // ── Page ──
+  pageContainer: {
+    width: SCREEN_W,
+    height: SCREEN_H,
+    backgroundColor: '#f5f0e8',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: C.primaryDark,
-    gap: 16,
   },
-  loadingText: {
+  pageImage: {
+    width: SCREEN_W,
+    height: SCREEN_H,
+  },
+  pageImageSpecial: {
+    marginTop: SCREEN_H * 0.12,
+    height: SCREEN_H * 0.88,
+  },
+
+  // ── Page non disponible ──
+  pendingContainer: {
+    flex: 1, justifyContent: 'center',
+    alignItems: 'center', gap: 12,
+  },
+  pendingText:    { fontSize: 18, color: C.textMuted, fontWeight: '600' },
+  pendingPageNum: { fontSize: 32, color: C.gold, fontWeight: '700' },
+
+  // ── Infos overlay ──
+  surahOverlay: {
+    position: 'absolute',
+    top: 65,
+    left: 35,
+  },
+  surahOverlayText: {
+    fontFamily: FONT_UI,
+    fontSize: 19,
     color: C.gold,
-    fontSize: 16,
+  },
+  hizbOverlay: {
+    position: 'absolute',
+    top: 65,
+    right: 35,
+  },
+  hizbOverlayText: {
+    fontFamily: FONT_UI,
+    fontSize: 20,
+    color: colors.border,
+  },
+  pageNumOverlay: {
+    position: 'absolute',
+    bottom: 50,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  pageNumOverlayText: {
+    fontFamily: FONT_UI,
+    fontSize: 20,
+    color: colors.border,
   },
 
-  // ── Écran ──
-  screen: {
-    flex: 1,
-    backgroundColor: C.primaryDark,
+  // ── Signet ──
+  signet:     {
+    position: 'absolute',
+    top: 0,
+    alignItems: 'center',
+  },
+  signetRight: { right: 43 },
+  signetLeft:  { left: 43  },
+  signetBody: {
+    width: 30,
+    height: 37,
+    backgroundColor: 'rgba(36, 74, 50, 0.31)',
+  },
+  signetTip: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 15,
+    borderRightWidth: 15,
+    borderTopWidth: 15,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderTopColor: 'rgba(36, 74, 50, 0.31)',
   },
 
-  // ── Header ──
+  // ── Marque-page ──
+  bookmarkMark: { position: 'absolute', top: 2 },
+  bookmarkIcon: { fontSize: 30 },
+
+  // ── Header overlay ──
   header: {
+    position: 'absolute', top: 0, left: 0, right: 0,
+    backgroundColor: C.primary,
+    borderBottomWidth: 1, borderBottomColor: C.gold + '55',
+    zIndex: 10,
+    paddingVertical: 10
+  },
+  headerInner: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: C.primary,
-    borderBottomWidth: 1,
-    borderBottomColor: C.gold + '55',
+    gap: 8,
   },
-  backButton: {
-    padding: 8,
-  },
-  backButtonText: {
-    fontSize: 22,
-    color: C.gold,
-    fontWeight: 'bold',
-  },
-  headerMeta: {
-    flexDirection: 'row',
-    gap: 4,
-  },
-  metaBadge: {
-    backgroundColor: C.gold + '25',
-    borderWidth: 1,
-    borderColor: C.gold + '66',
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-  metaBadgeText: {
-    color: C.gold,
-    fontSize: 11,
-    fontFamily: FONT_UI,
+  backButton:     { padding: 8 },
+  backButtonText: { fontSize: 22, color: C.gold, fontWeight: 'bold' },
+
+  // Zone centrale cliquable
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.08)',
   },
   headerSurah: {
-    flex: 1,
-    color: C.white,
-    fontSize: 16,
     fontFamily: FONT_UI,
-    textAlign: 'center',
-    marginHorizontal: 6,
+    fontSize: 20,
+    color: C.white,
+    lineHeight: 27,
   },
+  headerMetaRow: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  headerMetaText: {
+    fontFamily: FONT_UI,
+    fontSize: 12,
+    color: C.gold,
+  },
+  headerMetaSep: {
+    fontSize: 11,
+    color: C.gold + '88',
+  },
+
+  // Signet dans header
+  bookmarkBtn: {
+    padding: 8,
+  },
+  bookmarkBtnIcon: { fontSize: 20 },
+
   navButton: {
     padding: 8,
     borderWidth: 1,
     borderColor: C.gold + '55',
     borderRadius: 4,
   },
-  navButtonText: {
-    color: C.gold,
-    fontSize: 16,
-  },
+  navButtonText: { color: C.gold, fontSize: 16 },
 
-  // ── FlatList ──
-  // FIX responsive : flex:1 pour occuper tout l'espace entre header et footer
-  flatList: {
-    flex: 1,
+  // ── Toast ──
+  toast: {
+    position: 'absolute', bottom: 70, left: 30, right: 30,
+    backgroundColor: C.primaryDark + 'ee',
+    borderRadius: 12, paddingVertical: 12, paddingHorizontal: 20,
+    alignItems: 'center', zIndex: 20,
   },
+  toastText: { fontFamily: FONT_UI, color: C.white, fontSize: 15, textAlign: 'center' },
 
-  // ── Page ──
-  // FIX responsive : width = SCREEN_W, pas de hauteur fixe
-  pageContainer: {
-    width: SCREEN_W,
-    flex: 1,                       // ← s'étire pour remplir la hauteur disponible
-    backgroundColor: C.bgPage,
-    position: 'relative',
-  },
-  pageBorder: {
-    position: 'absolute',
-    top: 8,
-    bottom: 8,
-    width: 1,
-    backgroundColor: C.gold + '40',
-  },
-  pageBorderLeft:  { left: 6 },
-  pageBorderRight: { right: 6 },
-  pageInner: {
-    flex: 1,
-    paddingHorizontal: 18,
-    paddingTop: 10,
-    paddingBottom: 6,
-    justifyContent: 'space-between',
-  },
-
-  // ── En-tête sourate ──
-  surahHeaderContainer: {
-    marginBottom: 4,
-  },
-  surahBanner: {
-    backgroundColor: C.primary,
-    borderWidth: 1,
-    borderColor: C.gold,
-    borderRadius: 4,
-    paddingVertical: 7,
-    paddingHorizontal: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bannerOrnamentLeft: {
-    position: 'absolute',
-    left: 8,
-    top: 0, bottom: 0,
-    justifyContent: 'center',
-  },
-  bannerOrnamentRight: {
-    position: 'absolute',
-    right: 8,
-    top: 0, bottom: 0,
-    justifyContent: 'center',
-  },
-  bannerOrnamentText: {
-    color: C.gold,
-    fontSize: 13,
-  },
-  surahName: {
-    fontFamily: FONT_UI,
-    fontSize: 17,
-    fontWeight: '700',
-    color: C.white,
-    letterSpacing: 1,
-    textAlign: 'center',
-  },
-  bismillah: {
-    fontFamily: FONT_QURAN,
-    fontSize: 21,
-    color: C.text,
-    textAlign: 'center',
-    lineHeight: 21 * LINE_HEIGHT_RATIO,
-    marginTop: 4,
-    writingDirection: 'rtl',
-  },
-
-  // ── Lignes coraniques ──
-  linesContainer: {
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-  linesContainerCentered: {
-    justifyContent: 'center',
-    gap: 2,
-  },
-
-  // ── Texte coranique — logique Flutter exacte ──
-  quranLine: {
-    textAlign: 'center',
-    fontFamily: FONT_QURAN,
-    fontSize: FONT_SIZE_AYAH,
-    lineHeight: FONT_SIZE_AYAH * LINE_HEIGHT_RATIO,
-    writingDirection: 'rtl',
-    color: C.text,
-    letterSpacing: 0,
-  },
-  ayahText: {
-    fontFamily: FONT_QURAN,
-    fontSize: FONT_SIZE_AYAH,
-    lineHeight: FONT_SIZE_AYAH * LINE_HEIGHT_RATIO,
-    color: C.text,
-    letterSpacing: 0,
-  },
-  ayahTextEnd: {
-    fontFamily: FONT_QURAN,
-    fontSize: FONT_SIZE_AYAH,
-    lineHeight: FONT_SIZE_AYAH * LINE_HEIGHT_RATIO,
-    color: C.ayahEnd,              // #77554B — dernière lettre
-    letterSpacing: 0,
-  },
-  // FIX double cercle : on n'utilise plus \u06DD, juste le chiffre entre espaces
-  ayahNumber: {
-    fontFamily: FONT_QURAN,
-    fontSize: FONT_SIZE_AYAH_NUM,  // +3 comme Flutter
-    lineHeight: FONT_SIZE_AYAH_NUM * LINE_HEIGHT_RATIO,
-    color: C.ayahEnd,
-    letterSpacing: 0,
-  },
-
-  // ── Numéro de page ──
-  pageNumber: {
-    textAlign: 'center',
-    color: C.textMuted,
-    fontFamily: FONT_UI,
-    fontSize: 13,
-    marginTop: 2,
-    letterSpacing: 2,
-  },
-
-  // ── Footer — simplifié : juste le numéro de page ──
-  footer: {
-    alignItems: 'center',
-    paddingVertical: 8,
-    backgroundColor: C.primaryDark,
-    borderTopWidth: 1,
-    borderTopColor: C.gold + '33',
-  },
-  footerPageNum: {
-    color: C.gold,
-    fontFamily: FONT_UI,
-    fontSize: 13,
-    letterSpacing: 2,
-  },
-
-  // ── Drawer ──
-  drawerBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.55)',
-  },
-  drawerContainer: {
+  // ── Panneaux communs ──
+  panelBackdrop:  { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)' },
+  panelContainer: {
     backgroundColor: C.bg,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     borderTopWidth: 2,
     borderTopColor: C.gold,
-    maxHeight: SCREEN_H * 0.65,
+    height: SCREEN_H * 0.75,
     paddingBottom: 20,
   },
-  drawerHandle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
+  panelHandle: {
+    width: 40, height: 4, borderRadius: 2,
     backgroundColor: C.gold + '66',
-    alignSelf: 'center',
-    marginVertical: 10,
+    alignSelf: 'center', marginVertical: 10,
   },
-  drawerTabs: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: C.borderLight,
-    paddingHorizontal: 16,
-  },
-  drawerTab: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-  },
-  drawerTabActive: {
-    borderBottomColor: C.primary,
-  },
-  drawerTabText: {
+  panelTitle: {
     fontFamily: FONT_UI,
-    fontSize: 16,
-    color: C.textMuted,
+    fontSize: 18,
+    fontWeight: '700',
+    color: C.text,
+    textAlign: 'center',
+    marginBottom: 12,
   },
-  drawerTabTextActive: {
+  panelTabs: {
+    flexDirection: 'row',
+    borderBottomWidth: 1, borderBottomColor: C.border,
+    paddingHorizontal: 16,
+    marginBottom: 8,
+  },
+  panelTab: {
+    flex: 1, paddingVertical: 10, alignItems: 'center',
+    borderBottomWidth: 2, borderBottomColor: 'transparent',
+  },
+  panelTabActive:     { borderBottomColor: C.primary },
+  panelTabText:       { fontFamily: FONT_UI, fontSize: 15, color: C.textMuted },
+  panelTabTextActive: { color: C.primary, fontWeight: '700' },
+  panelContent: { 
+    height: SCREEN_H * 0.5, 
+    paddingHorizontal: 12 
+  },
+
+  // Barre de recherche
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: C.white,
+    borderRadius: 10,
+    marginHorizontal: 12,
+    marginBottom: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: C.border,
+  },
+  searchIcon:  { fontSize: 14, marginRight: 6 },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 8,
+    fontSize: 14,
+    color: C.text,
+    fontFamily: FONT_UI,
+  },
+
+  // ── Items Sourates ──
+  surahItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    marginBottom: 6,
+    backgroundColor: C.white,
+    borderWidth: 1,
+    borderColor: C.border,
+  },
+  surahItemActive: {
+    borderColor: C.gold,
+    backgroundColor: C.primary + '08',
+  },
+  surahItemLeft: {
+    width: 36, height: 36,
+    borderRadius: 18,
+    backgroundColor: C.primary + '15',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
+  },
+  surahItemNum: {
+    fontSize: 13,
     color: C.primary,
     fontWeight: '700',
   },
-  drawerContent: {
+  surahItemCenter: {
     flex: 1,
-    paddingHorizontal: 12,
-    paddingTop: 8,
+    alignItems: 'flex-end',
   },
-  drawerItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 9,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-    marginBottom: 3,
-    borderWidth: 1,
-    borderColor: C.borderLight,
-    backgroundColor: C.bg,
-  },
-  drawerItemActive: {
-    backgroundColor: C.primary + '15',
-    borderColor: C.primary,
-  },
-  drawerItemNum: {
-    fontSize: 12,
-    color: C.textMuted,
-    width: 24,
-    textAlign: 'center',
-  },
-  drawerItemText: {
-    flex: 1,
-    fontSize: 16,
-    color: C.text,
-    textAlign: 'right',
-    marginRight: 8,
-  },
-  drawerItemPage: {
-    fontSize: 11,
-    color: C.textMuted,
-  },
-  juzItem: {
-    flex: 1,
-    margin: 3,
-    paddingVertical: 10,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: C.borderLight,
-    backgroundColor: C.bg,
-    alignItems: 'center',
-  },
-  juzItemActive: {
-    backgroundColor: C.primary + '15',
-    borderColor: C.primary,
-  },
-  juzItemText: {
+  surahItemName: {
     fontFamily: FONT_UI,
     fontSize: 17,
     color: C.text,
-  },
-  juzItemTextActive: {
-    color: C.primary,
     fontWeight: '700',
   },
-  juzLabel: {
-    fontSize: 9,
+  surahItemMeta: {
+    fontFamily: FONT_UI,
+    fontSize: 12,
     color: C.textMuted,
+    marginTop: 2,
   },
-  pageJumpContainer: {
+
+  // ── Items Hizb / Juz ──
+  hizbJuzItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    marginBottom: 6,
+    backgroundColor: C.white,
+    borderWidth: 1,
+    borderColor: C.border,
+    alignItems: 'flex-end',
+  },
+  hizbJuzItemActive: {
+    borderColor: C.gold,
+    backgroundColor: C.primary + '08',
+  },
+  hizbJuzNum: {
+    fontFamily: FONT_UI,
+    fontSize: 17,
+    color: C.text,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  hizbJuzVerse: {
+    fontFamily: FONT_UI,
+    fontSize: 13,
+    color: C.textMuted,
+    textAlign: 'right',
+  },
+  activeIndicator: {
+    position: 'absolute',
+    left: 0, top: 0, bottom: 0,
+    width: 4,
+    backgroundColor: C.gold,
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+  },
+
+  // ── Items Signets ──
+  bookmarkItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    padding: 16,
-  },
-  pageJumpLabel: {
-    fontFamily: FONT_UI,
-    fontSize: 15,
-    color: C.textMuted,
-  },
-  pageJumpInput: {
-    width: 72,
-    paddingVertical: 7,
-    paddingHorizontal: 10,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: C.gold,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    marginBottom: 6,
     backgroundColor: C.white,
+    borderWidth: 1,
+    borderColor: C.border,
+  },
+  bookmarkDeleteBtn: {
+    width: 28, height: 28,
+    borderRadius: 14,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 12,
+  },
+  bookmarkDeleteIcon: { fontSize: 12, color: C.textMuted },
+  bookmarkItemInfo:   { flex: 1, alignItems: 'flex-end' },
+  bookmarkItemPage: {
     fontFamily: FONT_UI,
     fontSize: 16,
     color: C.text,
+    fontWeight: '700',
   },
-  pageJumpBtn: {
-    paddingHorizontal: 18,
-    paddingVertical: 7,
-    borderRadius: 6,
-    backgroundColor: C.primary,
-  },
-  pageJumpBtnText: {
+  bookmarkItemSurah: {
     fontFamily: FONT_UI,
-    fontSize: 15,
-    color: C.white,
+    fontSize: 13,
+    color: C.textMuted,
+    marginTop: 2,
+  },
+  emptyBookmarks: {
+    flex: 1, justifyContent: 'center',
+    alignItems: 'center', paddingTop: 40,
+  },
+  emptyBookmarksText: {
+    fontFamily: FONT_UI,
+    fontSize: 16,
+    color: C.textMuted,
   },
 });
 
