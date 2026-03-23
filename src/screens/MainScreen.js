@@ -89,6 +89,7 @@ const MainScreen = ({ navigation }) => {
       Alert.alert('خطأ', 'حدث خطأ أثناء مشاركة التطبيق');
     }
   };
+
   const handleAboutApp = () => {
     setMenuVisible(false);
     setTimeout(() => {
@@ -204,10 +205,42 @@ const MainScreen = ({ navigation }) => {
               <Text style={styles.arrowText}>←</Text>
             </View>
           </TouchableOpacity>
+
+          {/* ─────────────────────────────────────────
+              NEW CARD — Recitation Evaluation
+              Follows the exact same pattern as above
+          ───────────────────────────────────────── */}
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate('RecitationSelection')}
+            activeOpacity={0.85}>
+            <View style={styles.cardGradient} />
+            <View style={styles.iconContainer}>
+              {/*
+                Add a mic icon image to assets/ and rename it RecitationIcon.png
+                OR temporarily reuse an existing icon until you have the asset ready
+              */}
+              <Image 
+                source={require('../../assets/RecitationIcon.png')}
+                style={styles.cardIconImage}
+                resizeMode="contain"
+              />
+            </View>
+            <Text style={styles.cardTitle}>تقييم التلاوة</Text>
+            <Text style={styles.cardDescription}>
+              سجّل تلاوتك واكتشف أخطاء التجويد برواية قالون
+            </Text>
+            <View style={styles.cardArrow}>
+              <Text style={styles.arrowText}>←</Text>
+            </View>
+          </TouchableOpacity>
+          {/* ───────────────── END NEW CARD ───────── */}
+
         </View>
 
         <View style={{ height: 100 }} />
       </ScrollView>
+
       <TouchableOpacity
         style={styles.fab}
         onPress={() => navigation.navigate('QuranReading')}
@@ -218,6 +251,7 @@ const MainScreen = ({ navigation }) => {
           resizeMode="contain"
         />
       </TouchableOpacity>
+
       <Modal
         visible={menuVisible}
         transparent={true}
@@ -249,7 +283,6 @@ const MainScreen = ({ navigation }) => {
             <ScrollView 
               style={styles.menuContent}
               showsVerticalScrollIndicator={false}>
-              
 
               <View style={styles.menuSection}>
                 <Text style={styles.sectionTitle}>اتصل بنا</Text>
@@ -315,7 +348,6 @@ const MainScreen = ({ navigation }) => {
         </TouchableOpacity>
       </Modal>
 
-      {/* MODAL À PROPOS */}
       <Modal
         visible={aboutVisible}
         transparent={true}
@@ -323,14 +355,12 @@ const MainScreen = ({ navigation }) => {
         onRequestClose={() => setAboutVisible(false)}>
         <View style={styles.aboutModalOverlay}>
           <View style={styles.aboutCard}>
-            {/* Bouton fermer */}
             <TouchableOpacity
               style={styles.closeAboutButton}
               onPress={() => setAboutVisible(false)}>
               <Text style={styles.closeAboutIcon}>✕</Text>
             </TouchableOpacity>
 
-            {/* Icône de l'app */}
             <View style={styles.aboutIconContainer}>
               <Image 
                 source={require('../../assets/itqanIcon.png')}
@@ -339,13 +369,10 @@ const MainScreen = ({ navigation }) => {
               />
             </View>
 
-            {/* Titre */}
             <Text style={styles.aboutTitle}>عن إتقان</Text>
             
-            {/* Ligne décorative */}
             <View style={styles.aboutDivider} />
 
-            {/* Contenu */}
             <ScrollView 
               style={styles.aboutContentScroll}
               showsVerticalScrollIndicator={false}>
@@ -358,7 +385,8 @@ const MainScreen = ({ navigation }) => {
                 • مواضع في سورة معينة{'\n'}
                 • مواضع في صفحات معينة{'\n'}
                 • مواضع في حزب معيّن{'\n'}
-                • إنشاء اختبار مخصص{'\n\n'}
+                • إنشاء اختبار مخصص{'\n'}
+                • تقييم التلاوة بالذكاء الاصطناعي{'\n\n'}
                 
                 الهدف من التطبيق هو مساعدة حفظة القرآن الكريم على تثبيت حفظهم ومراجعة ما حفظوه بطريقة منظمة وممتعة.{'\n\n'}
                 
@@ -368,7 +396,6 @@ const MainScreen = ({ navigation }) => {
               </Text>
             </ScrollView>
 
-            {/* Bouton OK */}
             <TouchableOpacity
               style={styles.aboutOkButton}
               onPress={() => setAboutVisible(false)}>
@@ -554,7 +581,6 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     marginBottom: 24,
   },
-
   fab: {
     position: 'absolute',
     bottom: 30,
@@ -578,7 +604,6 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 35,
   },
-
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
@@ -640,7 +665,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     marginHorizontal: 7,
     borderWidth: 1.5,
-    borderRadius:15,
+    borderRadius: 15,
     borderColor: colors.secondary,
   },
   sectionTitle: {
@@ -660,9 +685,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginVertical: 3,
     borderWidth: 1.5,
-    borderRadius:15,
+    borderRadius: 15,
     borderColor: colors.borderLight,
-    backgroundColor: colors.bgWhite
+    backgroundColor: colors.bgWhite,
   },
   menuItemContent: {
     flexDirection: 'row-reverse',
@@ -705,8 +730,6 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
-
-  // MODAL À PROPOS
   aboutModalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
