@@ -1,7 +1,8 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
+//recitationTest screen import
+import RecitationTestScreen from '../screens/RecitationTestScreen';
 import MainScreen from '../screens/MainScreen';
 import SurahSelectionScreen from '../screens/SurahSelectionScreen';
 import PageSelectionScreen from '../screens/PageSelectionScreen';
@@ -90,6 +91,10 @@ const AppNavigator = () => {
           options={{ title: 'قراءة المصحف' }}
         />
         
+        <Stack.Screen 
+          name="RecitationTest" 
+          component={RecitationTestScreen} 
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
