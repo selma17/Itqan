@@ -26,6 +26,7 @@ const DuaaScreen = ({ navigation, route }) => {
     selectedHizbs,
     mode,
     versesToRead,
+    showSurahName
   } = route.params;
 
   const handleReady = () => {
@@ -40,6 +41,7 @@ const DuaaScreen = ({ navigation, route }) => {
         questionCount,
         mode,
         versesToRead,
+        showSurahName,
       });
     } else {
       // Navigation vers Test standard (ancien comportement)
@@ -51,6 +53,7 @@ const DuaaScreen = ({ navigation, route }) => {
         hizbNumber,
         selectionMode,
         questionCount,
+        showSurahName,
       });
     }
   };

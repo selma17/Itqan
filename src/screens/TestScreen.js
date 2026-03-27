@@ -26,8 +26,10 @@ const TestScreen = ({ navigation, route }) => {
     pageTo, 
     hizbNumber,
     questionCount,
-    selectionMode = 'random'
+    selectionMode = 'random',
+    showSurahName = true
   } = route.params;
+  console.log('showSurahName reçu:', showSurahName);
 
   const hasDefinedQuestionCount = questionCount && questionCount > 0;
 
@@ -504,7 +506,9 @@ const TestScreen = ({ navigation, route }) => {
           </View>
           
           <View style={styles.questionTextContainer}>
-            <Text style={styles.surahName}>سورة {currentVerse.surahName}</Text>
+            <Text style={styles.surahName}>
+              {showSurahName ? `سورة ${currentVerse.surahName}` : '-------'}
+            </Text>
             <Text style={styles.instructionText}>
               اقرأ من قوله تعالى (آية {currentVerse.verseNumber}):
             </Text>
@@ -849,6 +853,7 @@ const styles = StyleSheet.create({
     elevation: 4,
     borderWidth: 2,
     borderColor: colors.secondary,
+ 
   },
   verseOrnament: {
     width: wp(50),
@@ -869,7 +874,7 @@ const styles = StyleSheet.create({
   verseText: {
     fontSize: FONT_SIZES.verse, 
     lineHeight: 40, 
-    textAlign: 'right',
+    textAlign: 'center',
     color: colors.textPrimary,
     writingDirection: 'rtl',
     fontFamily: 'ScheherazadeNew_400Regular',  

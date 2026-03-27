@@ -13,6 +13,8 @@ import CustomResultsScreen from '../screens/CustomResultsScreen';
 import CustomTestScreen from '../screens/CustomTestScreen';
 import CustomTestSetupScreen from '../screens/CustomTestSetupScreen';
 import QuranReadingScreen from '../screens/QuranReadingScreen';
+import TestsScreen from '../screens/TestsScreen';
+import SettingsScreen from '../screens/SettingsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -89,6 +91,18 @@ const AppNavigator = () => {
           component={QuranReadingScreen}
           options={{ title: 'قراءة المصحف' }}
         />
+
+      <Stack.Screen
+        name="Tests"
+        component={TestsScreen}
+        options={{ title: 'الاختبارات' }}
+      />
+
+      <Stack.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{ title: 'الإعدادات' }}
+      />
         
       </Stack.Navigator>
     </NavigationContainer>

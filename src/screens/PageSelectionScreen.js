@@ -10,6 +10,7 @@ const PageSelectionScreen = ({ navigation }) => {
   const [pageTo, setPageTo] = useState('');
   const [questionCount, setQuestionCount] = useState('');
   const [mode, setMode] = useState('random');
+  const [showSurahName, setShowSurahName] = useState('');
 
   const handleStartTest = () => {
     const from = parseInt(pageFrom);
@@ -41,6 +42,7 @@ const PageSelectionScreen = ({ navigation }) => {
       pageTo: to,
       selectionMode: mode,
       questionCount: questionCount ? parseInt(questionCount) : null,
+      showSurahName: showSurahName,
     });
   };
 
@@ -170,6 +172,33 @@ const PageSelectionScreen = ({ navigation }) => {
               textAlign="center"
             />
           </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>عرض اسم السورة التي ورد فيها الموضع</Text>
+            <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+              <TouchableOpacity
+                style={[styles.radioButton, { flex: 1 }, showSurahName === true && styles.radioButtonActive]}
+                onPress={() => setShowSurahName(true)}>
+                <Text style={[styles.radioText, showSurahName === true && styles.radioTextActive]}>
+                  نعم
+                </Text>
+                <View style={[styles.radio, showSurahName === true && styles.radioActive]}>
+                  {showSurahName === true && <View style={styles.radioInner} />}
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.radioButton, { flex: 1 }, showSurahName === false && styles.radioButtonActive]}
+                onPress={() => setShowSurahName(false)}>
+                <Text style={[styles.radioText, showSurahName === false && styles.radioTextActive]}>
+                  لا
+                </Text>
+                <View style={[styles.radio, showSurahName === false && styles.radioActive]}>
+                  {showSurahName === false && <View style={styles.radioInner} />}
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+          
           {isValid && (
             <View style={styles.rangeInfoCard}>  
               <View style={styles.pageCountBox}>
@@ -179,7 +208,7 @@ const PageSelectionScreen = ({ navigation }) => {
             </View>
           )}
 
-          <View style={styles.helpBox}>
+            <View style={styles.helpBox}>
             <Text style={styles.helpIcon}>ℹ️</Text>
             <View style={styles.helpContent}>
               <Text style={styles.helpTitle}>معلومة</Text>

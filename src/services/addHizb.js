@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 // chemins corrects
-const dataPath = path.join(__dirname, "../data/qaloonQuran.json");
+const dataPath = path.join(__dirname, "../data/dooriQuran.json");
 
 // charger le Coran
 const data = JSON.parse(fs.readFileSync(dataPath, "utf8"));
@@ -101,4 +101,4 @@ fs.writeFileSync(
   "utf8"
 );
 
-console.log("✅ Champ hizb ajouté correctement (Qaloun – Madinah)");
+console.log("✅ Champ hizb ajouté correctement (Doori – Madinah)");

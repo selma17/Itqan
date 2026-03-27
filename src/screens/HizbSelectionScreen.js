@@ -12,6 +12,7 @@ const HizbSelectionScreen = ({ navigation }) => {
   const [questionCount, setQuestionCount] = useState('');
   const [mode, setMode] = useState('random');
   const [hizbInfo, setHizbInfo] = useState(null);
+  const [showSurahName, setShowSurahName] = useState(true);
 
   useEffect(() => {
     if (selectedHizb) {
@@ -88,6 +89,7 @@ const HizbSelectionScreen = ({ navigation }) => {
       hizbNumber: parseInt(selectedHizb),
       selectionMode: mode,
       questionCount: questionCount ? parseInt(questionCount) : null,
+      showSurahName: showSurahName,
     });
   };
 
@@ -230,6 +232,32 @@ const HizbSelectionScreen = ({ navigation }) => {
               )}
             </View>
           )}
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>عرض اسم السورة التي ورد فيها الموضع</Text>
+            <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+              <TouchableOpacity
+                style={[styles.radioButton, { flex: 1 }, showSurahName === true && styles.radioButtonActive]}
+                onPress={() => setShowSurahName(true)}>
+                <Text style={[styles.radioText, showSurahName === true && styles.radioTextActive]}>
+                  نعم
+                </Text>
+                <View style={[styles.radio, showSurahName === true && styles.radioActive]}>
+                  {showSurahName === true && <View style={styles.radioInner} />}
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.radioButton, { flex: 1 }, showSurahName === false && styles.radioButtonActive]}
+                onPress={() => setShowSurahName(false)}>
+                <Text style={[styles.radioText, showSurahName === false && styles.radioTextActive]}>
+                  لا
+                </Text>
+                <View style={[styles.radio, showSurahName === false && styles.radioActive]}>
+                  {showSurahName === false && <View style={styles.radioInner} />}
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
 
           <TouchableOpacity
             style={[styles.startButton, isButtonDisabled && styles.startButtonDisabled]}

@@ -31,6 +31,7 @@ const CustomTestScreen = ({ navigation, route }) => {
     questionCount,
     mode,
     versesToRead,
+    showSurahName = true
   } = route.params;
 
   const [allQuestions, setAllQuestions] = useState([]);
@@ -390,7 +391,9 @@ const CustomTestScreen = ({ navigation, route }) => {
             <Text style={styles.questionNumber}>{currentQuestionIndex + 1}/{allQuestions.length}</Text>
           </View>
           <View style={styles.questionTextContainer}>
-            <Text style={styles.surahName}>سورة {currentVerse.surahName}</Text>
+            <Text style={styles.surahName}>
+              {showSurahName ? `سورة ${currentVerse.surahName}` : '-------'}
+            </Text>
             <Text style={styles.instructionText}>
               اقرأ من قوله تعالى (آية {currentVerse.verseNumber}):
             </Text>
