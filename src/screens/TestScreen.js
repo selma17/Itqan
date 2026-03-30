@@ -25,6 +25,9 @@ const TestScreen = ({ navigation, route }) => {
     pageFrom, 
     pageTo, 
     hizbNumber,
+    hizbFrom, 
+    hizbTo,
+    partLabel,
     questionCount,
     selectionMode = 'random',
     showSurahName = true
@@ -85,8 +88,21 @@ const TestScreen = ({ navigation, route }) => {
               juz: v.juz,
             });
           });
+        } else if (testType === 'GeneralPart') {
+          for (let h = hizbFrom; h <= hizbTo; h++) {
+            const hizbVerses = quranData.getVersesByHizb(h) || [];
+            hizbVerses.forEach(v => {
+              allVerses.push({
+                surahNumber: v.surahNumber,
+                surahName: v.surahName,
+                verseNumber: v.verseNumber,
+                text: v.text,
+                page: v.page,
+                juz: v.juz,
+              });
+            });
+          }
         }
-
         if (allVerses.length === 0) {
           Alert.alert('خطأ', 'لم يتم العثور على آيات');
           navigation.goBack();
@@ -152,7 +168,7 @@ const TestScreen = ({ navigation, route }) => {
     };
 
     generateQuestions();
-  }, [testType, surahNumber, pageFrom, pageTo, hizbNumber, questionCount, selectionMode]);
+  }, [testType, surahNumber, pageFrom, pageTo, hizbNumber, hizbFrom, hizbTo, questionCount, selectionMode]);
 
   const loadRandomVerse = React.useCallback(() => {
     if (hasDefinedQuestionCount) return;
@@ -198,6 +214,20 @@ const TestScreen = ({ navigation, route }) => {
             juz: v.juz,
           });
         });
+      } else if (testType === 'GeneralPart') {
+        for (let h = hizbFrom; h <= hizbTo; h++) {
+          const hVerses = quranData.getVersesByHizb(h) || [];
+          hVerses.forEach(v => {
+            verses.push({
+              surahNumber: v.surahNumber,
+              surahName: v.surahName,
+              verseNumber: v.verseNumber,
+              text: v.text,
+              page: v.page,
+              juz: v.juz,
+            });
+          });
+        }
       }
 
       setUsedVerses(currentUsed => {
@@ -263,6 +293,11 @@ const TestScreen = ({ navigation, route }) => {
         page: v.page,
         juz: v.juz,
       }));
+    } else if (testType === 'GeneralPart') {
+      for (let h = hizbFrom; h <= hizbTo; h++) {
+        const hVerses = quranData.getVersesByHizb(h) || [];
+        allTestVerses = allTestVerses.concat(hVerses);
+      }
     }
 
     // Trouver le verset actuel dans le range
@@ -310,6 +345,11 @@ const TestScreen = ({ navigation, route }) => {
         page: v.page,
         juz: v.juz,
       }));
+    } else if (testType === 'GeneralPart') {
+      for (let h = hizbFrom; h <= hizbTo; h++) {
+        const hVerses = quranData.getVersesByHizb(h) || [];
+        allTestVerses = allTestVerses.concat(hVerses);
+      }
     }
 
     // Trouver le verset actuel dans le range
@@ -351,6 +391,9 @@ const TestScreen = ({ navigation, route }) => {
           pageFrom,
           pageTo,
           hizbNumber,
+          hizbFrom,
+          hizbTo,
+          partLabel,
           questionCount,
           selectionMode,
         });
@@ -379,6 +422,9 @@ const TestScreen = ({ navigation, route }) => {
           pageFrom,
           pageTo,
           hizbNumber,
+          hizbFrom,
+          hizbTo,
+          partLabel,
           questionCount,
           selectionMode,
         });
@@ -423,6 +469,9 @@ const TestScreen = ({ navigation, route }) => {
         pageFrom,
         pageTo,
         hizbNumber,
+        hizbFrom,
+        hizbTo,
+        partLabel,
         questionCount,
         selectionMode,
       });
@@ -435,6 +484,9 @@ const TestScreen = ({ navigation, route }) => {
         pageFrom,
         pageTo,
         hizbNumber,
+        hizbFrom,
+        hizbTo,
+        partLabel,
         questionCount,
         selectionMode,
       });
@@ -619,6 +671,9 @@ const TestScreen = ({ navigation, route }) => {
                         pageFrom,
                         pageTo,
                         hizbNumber,
+                        hizbFrom,
+                        hizbTo,
+                        partLabel,
                         questionCount,
                         selectionMode,
                       });

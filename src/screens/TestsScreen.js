@@ -104,6 +104,26 @@ const TestsScreen = ({ navigation }) => {
 
           <TouchableOpacity
             style={styles.card}
+            onPress={() => navigation.navigate('GeneralPartsSelection')}
+            activeOpacity={0.85}>
+            <View style={styles.cardGradient} />
+            <View style={styles.iconContainer}>
+              <Image
+                source={require('../../assets/CustomTesticon.png')}
+                style={styles.cardIconImage}
+                resizeMode="contain"
+              />
+            </View>
+            <Text style={styles.cardTitle}>مواضع شاملة من القرآن</Text>
+            <Text style={styles.cardDescription}>إختبارات في أنصاف و أرباع القرآن</Text>
+            <View style={styles.cardArrow}>
+              <Text style={styles.arrowText}>←</Text>
+            </View>
+          </TouchableOpacity>
+
+
+          <TouchableOpacity
+            style={styles.card}
             onPress={() => navigation.navigate('CustomTestSetup')}
             activeOpacity={0.85}>
             <View style={styles.cardGradient} />

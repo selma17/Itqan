@@ -18,6 +18,9 @@ const DuaaScreen = ({ navigation, route }) => {
     pageFrom, 
     pageTo, 
     hizbNumber,
+    hizbFrom,
+    hizbTo,
+    partLabel,
     selectionMode,
     questionCount,
     sourceType,
@@ -51,6 +54,9 @@ const DuaaScreen = ({ navigation, route }) => {
         pageFrom,
         pageTo,
         hizbNumber,
+        hizbFrom,
+        hizbTo,
+        partLabel,
         selectionMode,
         questionCount,
         showSurahName,
@@ -97,9 +103,12 @@ const DuaaScreen = ({ navigation, route }) => {
       return `السورة رقم ${surahNumber}`;
     } else if (testType === 'Hizb') {
       return `الحزب رقم ${hizbNumber}`;
-    } else {
+    } 
+    else if (testType === 'GeneralPart') {
+      return partLabel || 'جزء من القرآن';
+    }else {
       return `الصفحات ${pageFrom} - ${pageTo}`;
-    }
+    } 
   };
 
   return (

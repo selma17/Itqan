@@ -20,8 +20,12 @@ const ResultsScreen = ({ navigation, route }) => {
     pageFrom, 
     pageTo,
     hizbNumber,
+    hizbFrom,
+    hizbTo,
+    partLabel,
     questionCount,
     selectionMode,
+    showSurahName, 
   } = route.params;
 
   const total = score + errors;
@@ -69,8 +73,12 @@ const ResultsScreen = ({ navigation, route }) => {
       pageFrom,
       pageTo,
       hizbNumber,
+      hizbFrom,
+      hizbTo,
+      partLabel,
       questionCount,
       selectionMode,
+      showSurahName, 
     });
   };
 

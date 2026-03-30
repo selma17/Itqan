@@ -15,7 +15,7 @@ import CustomTestSetupScreen from '../screens/CustomTestSetupScreen';
 import QuranReadingScreen from '../screens/QuranReadingScreen';
 import TestsScreen from '../screens/TestsScreen';
 import SettingsScreen from '../screens/SettingsScreen';
-
+import GeneralPartsSelectionScreen from '../screens/GeneralPartsSelectionScreen';
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -102,6 +102,11 @@ const AppNavigator = () => {
         name="Settings"
         component={SettingsScreen}
         options={{ title: 'الإعدادات' }}
+      />
+
+      <Stack.Screen 
+      name="GeneralPartsSelection" 
+      component={GeneralPartsSelectionScreen} 
       />
         
       </Stack.Navigator>
