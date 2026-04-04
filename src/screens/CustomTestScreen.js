@@ -12,15 +12,17 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import colors from '../styles/colors';
-import quranData from '../data/quranData';
+import { useQuran } from '../context/QuranContext';
 import { wp, hp, fp, SPACING, FONT_SIZES, RADIUS } from '../utils/responsive';
 import { useFonts, ScheherazadeNew_400Regular } from '@expo-google-fonts/scheherazade-new';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const GOLD = '#D4AF37';
 const GOLD_LIGHT = '#F4E4C1';
 
 const CustomTestScreen = ({ navigation, route }) => {
+  const { quranData } = useQuran();
+  if (!quranData) return null;
   let [fontsLoaded] = useFonts({ ScheherazadeNew_400Regular,});
   const [fontLoaded, setFontLoaded] = useState(false);
   const {
@@ -45,8 +47,16 @@ const CustomTestScreen = ({ navigation, route }) => {
   const [startTime] = useState(Date.now());
   const [elapsedTime, setElapsedTime] = useState(0);
   const [currentQuestionAnswered, setCurrentQuestionAnswered] = useState(false);
-
   const timerRef = useRef(null);
+  
+  const [verseFontSize, setVerseFontSize] = useState(fp(25));
+
+  useEffect(() => {
+    AsyncStorage.getItem('verse_font_step').then(val => {
+      const steps = [fp(19), fp(25), fp(31), fp(37)];
+      if (val !== null) setVerseFontSize(steps[Number(val)] ?? fp(25));
+    });
+  }, []);
 
   useEffect(() => {
     timerRef.current = setInterval(() => {
@@ -410,7 +420,7 @@ const CustomTestScreen = ({ navigation, route }) => {
               contentContainerStyle={styles.verseScrollContent}
               showsVerticalScrollIndicator={true}
               persistentScrollbar={true}>
-              <Text style={styles.verseText}>{currentVerse.text}</Text>
+              <Text style={[styles.verseText, { fontSize: verseFontSize, lineHeight: verseFontSize * 1.8 }]}>{currentVerse.text}</Text>
             </ScrollView>
             <View style={styles.verseOrnament} />
 

@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { useFonts } from 'expo-font';
 import AppNavigator from './src/navigation/AppNavigator';
+import { QuranProvider } from './src/context/QuranContext';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -20,5 +20,9 @@ export default function App() {
     );
   }
 
-  return <AppNavigator />;
+  return (
+    <QuranProvider>
+      <AppNavigator />
+    </QuranProvider>
+  );
 }

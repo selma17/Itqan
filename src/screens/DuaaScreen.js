@@ -9,9 +9,10 @@ import {
   ScrollView,
 } from 'react-native';
 import colors from '../styles/colors';
-import quranData from '../data/quranData';
+import { useQuran } from '../context/QuranContext';
 
 const DuaaScreen = ({ navigation, route }) => {
+  const { quranData } = useQuran();
   const { 
     testType, 
     surahNumber, 
@@ -31,6 +32,7 @@ const DuaaScreen = ({ navigation, route }) => {
     versesToRead,
     showSurahName
   } = route.params;
+  if (!quranData) return null;
 
   const handleReady = () => {
     // Vérifier si c'est un test personnalisé (CustomTest) ou un test standard

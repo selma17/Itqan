@@ -62,7 +62,7 @@ const ResultsScreen = ({ navigation, route }) => {
   const result = getMessage();
 
   const handleBackToMain = () => {
-    navigation.navigate('Main');
+    navigation.navigate('Tests');
   };
 
   const handleRestartTest = () => {

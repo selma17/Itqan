@@ -1,16 +1,10 @@
 const fs = require("fs");
 const path = require("path");
 
-// chemins corrects
-const dataPath = path.join(__dirname, "../data/dooriQuran.json");
+const dataPath = path.join(__dirname, "../data/hafsQuran.json");
 
-// charger le Coran
 const data = JSON.parse(fs.readFileSync(dataPath, "utf8"));
 
-/**
- * Définition OFFICIELLE des 60 hizb
- * (exactement ton document)
- */
 const hizbRanges = [
   { hizb: 1, start: { s: 1, a: 1 }, end: { s: 2, a: 74 } },
   { hizb: 2, start: { s: 2, a: 75 }, end: { s: 2, a: 141 } },
@@ -74,7 +68,6 @@ const hizbRanges = [
   { hizb: 60, start: { s: 87, a: 1 }, end: { s: 114, a: 6 } }
 ];
 
-// fonction de comparaison
 function inRange(s, a, start, end) {
   if (s < start.s || s > end.s) return false;
   if (s === start.s && a < start.a) return false;
@@ -82,23 +75,29 @@ function inRange(s, a, start, end) {
   return true;
 }
 
-// ajout du hizb
-const updated = data.map(aya => {
+const cleaned = data.map(aya => {
   const hizbObj = hizbRanges.find(h =>
-    inRange(aya.sura_no, aya.aya_no, h.start, h.end)
+    inRange(aya.sora, aya.aya_no, h.start, h.end)
   );
 
   return {
-    ...aya,
+    id: aya.id,
+    jozz: aya.jozz,
+    page: aya.page,
+    sura_no: aya.sora,
+    sura_name_en: aya.sora_name_en,
+    sura_name_ar: aya.sora_name_ar,
+    line_start: aya.line_start,
+    line_end: aya.line_end,
+    aya_no: aya.aya_no,
+    aya_text: aya.aya_text,
+    aya_text_emlaey: aya.aya_text_emlaey,
     hizb: hizbObj ? hizbObj.hizb : null
   };
 });
 
-// écriture du fichier
-fs.writeFileSync(
-  dataPath,
-  JSON.stringify(updated, null, 2),
-  "utf8"
-);
+fs.writeFileSync(dataPath, JSON.stringify(cleaned, null, 2), "utf8");
 
-console.log("✅ Champ hizb ajouté correctement (Doori – Madinah)");
+const verify = JSON.parse(fs.readFileSync(dataPath, "utf8"));
+console.log("Premier item:", JSON.stringify(verify[0], null, 2));
+console.log("✅ Done:", cleaned.length, "ayahs");

@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getActiveTestRiwaya } from '../utils/riwayaManager';
+import { RIWAYAT } from '../data/riwayat';
 import {
   View,
   Text,
@@ -18,7 +20,21 @@ import colors from '../styles/colors';
 
 const { width } = Dimensions.get('window');
 
+
 const TestsScreen = ({ navigation }) => {
+  const [testRiwayaName, setTestRiwayaName] = useState('قالون عن نافع المدني');
+
+  useEffect(() => {
+    getActiveTestRiwaya().then(id => {
+      const r = RIWAYAT[id];
+      if (r) setTestRiwayaName(r.fullNameAr);
+    });
+  }, []);
+
+  const handleBackToMain = () => {
+    navigation.navigate('Main');
+  };
+  
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={colors.primaryDark} />
@@ -32,13 +48,13 @@ const TestsScreen = ({ navigation }) => {
 
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => navigation.goBack()}>
+            onPress={handleBackToMain} >
             <Text style={styles.backButtonText}>›</Text>
           </TouchableOpacity>
 
           <View style={styles.ornamentTop} />
           <Text style={styles.mainTitle}>مواضع في القرآن الكريم</Text>
-          <Text style={styles.subtitle}>برواية قالون عن نافع المدني</Text>
+          <Text style={styles.subtitle}>ب{testRiwayaName}</Text>
           <View style={styles.ornamentBottom} />
         </View>
 

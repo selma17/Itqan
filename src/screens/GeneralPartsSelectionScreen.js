@@ -4,7 +4,7 @@ import {
   StatusBar, ScrollView, Alert, TextInput, ToastAndroid, Platform,
 } from 'react-native';
 import colors from '../styles/colors';
-import quranData from '../data/qaloonQuran.json';
+import { useQuran } from '../context/QuranContext';
 
 // Définition des parties et leurs plages de hizbs (hizbs 1-60)
 const PARTS = {
@@ -75,6 +75,7 @@ const getPartInfo = (part) => {
 };
 
 const GeneralPartsSelectionScreen = ({ navigation }) => {
+  const { rawData: quranData } = useQuran();
   const [selectedCategory, setSelectedCategory] = useState('quarters');
   const [selectedPart, setSelectedPart]         = useState(null);
   const [partInfo, setPartInfo]                 = useState(null);

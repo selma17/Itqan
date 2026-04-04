@@ -12,11 +12,15 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import colors from '../styles/colors';
-import quranData from '../data/quranData';
+import { useQuran } from '../context/QuranContext';
 import { wp, hp, fp, SPACING, FONT_SIZES, RADIUS } from '../utils/responsive';
 import { useFonts, ScheherazadeNew_400Regular } from '@expo-google-fonts/scheherazade-new';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TestScreen = ({ navigation, route }) => {
+  const { quranData , activeRiwaya, rawData} = useQuran();
+  console.log('rawData length:', rawData?.length);
+  console.log('premier item rawData:', JSON.stringify(rawData?.[0]));
   let [fontsLoaded] = useFonts({ ScheherazadeNew_400Regular,});
   const [fontLoaded, setFontLoaded] = useState(false);
   const { 
@@ -33,6 +37,7 @@ const TestScreen = ({ navigation, route }) => {
     showSurahName = true
   } = route.params;
   console.log('showSurahName reçu:', showSurahName);
+  if (!quranData) return null;
 
   const hasDefinedQuestionCount = questionCount && questionCount > 0;
 
@@ -46,8 +51,16 @@ const TestScreen = ({ navigation, route }) => {
   const [showNewQuestionModal, setShowNewQuestionModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [usedVerses, setUsedVerses] = useState(new Set());
+  
+  const [verseFontSize, setVerseFontSize] = useState(fp(25));
   useEffect(() => {
-    
+    AsyncStorage.getItem('verse_font_step').then(val => {
+      const steps = [fp(19), fp(25), fp(31), fp(37)];
+      if (val !== null) setVerseFontSize(steps[Number(val)] ?? fp(25));
+    });
+  }, []);
+
+  useEffect(() => {  
     const generateQuestions = () => {
       try {
         let allVerses = [];
@@ -580,7 +593,7 @@ const TestScreen = ({ navigation, route }) => {
             showsVerticalScrollIndicator={true}
             indicatorStyle="default"
           >
-            <Text style={styles.verseText}>
+            <Text style={[styles.verseText, { fontSize: verseFontSize, lineHeight: verseFontSize * 1.8 }]}>
               {currentVerse.text}
             </Text>
           </ScrollView>

@@ -5,9 +5,10 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import colors from '../styles/colors';
-import quranData from '../data/qaloonQuran.json';
+import { useQuran } from '../context/QuranContext';
 
 const HizbSelectionScreen = ({ navigation }) => {
+  const { rawData: quranData } = useQuran();
   const [selectedHizb, setSelectedHizb] = useState('');
   const [questionCount, setQuestionCount] = useState('');
   const [mode, setMode] = useState('random');

@@ -10,9 +10,10 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import colors from '../styles/colors';
-import quranData from '../data/qaloonQuran.json';
+import { useQuran } from '../context/QuranContext';
 
 const CustomResultsScreen = ({ navigation, route }) => {
+  const { rawData: quranData } = useQuran();
   const {
     score,
     errors,
@@ -370,9 +371,9 @@ const CustomResultsScreen = ({ navigation, route }) => {
 
           <TouchableOpacity
             style={styles.homeButton}
-            onPress={() => navigation.navigate('Main')}
+            onPress={() => navigation.navigate('Tests')}
             activeOpacity={0.85}>
-            <Text style={styles.homeButtonText}>العودة للرئيسية</Text>
+            <Text style={styles.homeButtonText}>العودة لقائمة الإختبارات</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

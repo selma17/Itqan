@@ -1,4 +1,4 @@
-import qaloonQuran from './qaloonQuran.json';
+// quranData.js — ne plus importer statiquement, utiliser buildQuranData(rawData)
 
 const groupBySurah = (ayahs) => {
   const surahs = {};
@@ -79,16 +79,18 @@ const groupByHizb = (ayahs) => {
   return hizbs;
 };
 
-const surahsData = groupBySurah(qaloonQuran);
-const pagesData = groupByPage(qaloonQuran);
-const hizbsData = groupByHizb(qaloonQuran);
+// ── buildQuranData : construit l'objet quranData à partir d'un tableau brut ──
+export const buildQuranData = (rawData) => {
+  const surahsData = groupBySurah(rawData);
+  const pagesData  = groupByPage(rawData);
+  const hizbsData  = groupByHizb(rawData);
 
-const getRevelationType = (surahNumber) => {
+  const getRevelationType = (surahNumber) => {
   const medinanSurahs = [2, 3, 4, 5, 8, 9, 22, 24, 33, 47, 48, 49, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 76, 98, 110];
   return medinanSurahs.includes(surahNumber) ? 'Medinan' : 'Meccan';
 };
 
-export const quranData = {
+  const quranData = {
   surahs: surahsData.map(surah => ({
     number: surah.number,
     name: surah.name,
@@ -213,4 +215,9 @@ export const quranData = {
   },
 };
 
+  return quranData;
+};
+
+// Export statique pour compatibilité (qaloon par défaut)
+export const quranData = buildQuranData(require('./qaloonQuran.json'));
 export default quranData;

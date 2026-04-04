@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from '../styles/colors';
 import quranImages from '../data/quranImagesIndex';
 import navIndex from '../data/quranIndex.json';
-import qaloonData from '../data/qaloonQuran.json';
+import { useQuran } from '../context/QuranContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts, ScheherazadeNew_400Regular } from '@expo-google-fonts/scheherazade-new';
 console.log('navIndex surahs:', navIndex?.surahs?.length);
@@ -331,6 +331,7 @@ const BookmarksPanel = ({ visible, bookmarks, onGoTo, onDelete, onClose }) => {
 
 // ── Écran principal ──
 const QuranReadingScreen = ({ navigation }) => {
+  const { rawData: qaloonData } = useQuran();
   const [fontsLoaded] = useFonts({ ScheherazadeNew_400Regular });
 
   const flatListRef                     = useRef(null);
