@@ -225,7 +225,7 @@ const PageSelectionScreen = ({ navigation }) => {
             disabled={isButtonDisabled}>
             <Text style={styles.startButtonText}>
               {isButtonDisabled 
-                ? (mode === 'sequential' && !questionCount ? 'حدد عدد الأسئلة أولاً' : 'أدخل نطاق الصفحات')
+                ? (mode === 'sequential' && !questionCount ? 'حدد عدد الأسئلة' : 'أدخل نطاق الصفحات')
                 : 'بدء الاختبار'
               }
             </Text>

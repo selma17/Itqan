@@ -267,7 +267,7 @@ const HizbSelectionScreen = ({ navigation }) => {
             disabled={isButtonDisabled}>
             <Text style={styles.startButtonText}>
               {isButtonDisabled 
-                ? (mode === 'sequential' && !questionCount ? 'حدد عدد الأسئلة أولاً' : 'اختر الحزب أولاً')
+                ? (mode === 'sequential' && !questionCount ? 'حدد عدد الأسئلة' : 'اختر الحزب')
                 : 'بدء الاختبار'
               }
             </Text>

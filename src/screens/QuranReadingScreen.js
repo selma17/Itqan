@@ -41,18 +41,18 @@ const getSurahName = (p) => {
 const getHizbNum    = (p) => navIndex.hizbs.filter(h => h.first_page <= p).pop()?.hizb_number  || '';
 
 // ── Premier verset d'un hizb ──
-const getFirstVerseOfHizb = (hizbNum) => {
+const getFirstVerseOfHizb = (hizbNum, data) => {
   const hizbInfo = navIndex.hizbs.find(h => h.hizb_number === hizbNum);
-  if (!hizbInfo) return '';
-  const aya = qaloonData.find(a => parseInt(a.page) === hizbInfo.first_page);
+  if (!hizbInfo || !data) return '';
+  const aya = data.find(a => parseInt(a.page) === hizbInfo.first_page);
   return aya ? aya.aya_text.slice(0, 40) + '...' : '';
 };
 
 // ── Premier verset d'un juz ──
-const getFirstVerseOfJuz = (juzNum) => {
+const getFirstVerseOfJuz = (juzNum, data) => {
   const juzInfo = navIndex.juzs.find(j => j.juz_number === juzNum);
-  if (!juzInfo) return '';
-  const aya = qaloonData.find(a => parseInt(a.page) === juzInfo.first_page);
+  if (!juzInfo || !data) return '';
+  const aya = data.find(a => parseInt(a.page) === juzInfo.first_page);
   return aya ? aya.aya_text.slice(0, 40) + '...' : '';
 };
 
@@ -90,7 +90,7 @@ const MushafPage = React.memo(({ pageNum, onTap, bookmarks, fontsLoaded }) => {
         {/* Marque-page actif */}
         {isBookmark && (
           <View style={[styles.bookmarkMark, isOdd ? styles.signetRight : styles.signetLeft]}>
-            <Text style={styles.bookmarkIcon}>🔖</Text>
+            <Image source={require('../../assets/bookmark_filled.png')} style={styles.bookmarkIcon} />
           </View>
         )}
 
@@ -114,7 +114,7 @@ const MushafPage = React.memo(({ pageNum, onTap, bookmarks, fontsLoaded }) => {
 });
 
 // ── Panneau Navigation (sourates / hizbs / juz) ──
-const NavigationPanel = ({ visible, currentPage, onGoTo, onClose }) => {
+const NavigationPanel = ({ visible, currentPage, onGoTo, onClose, rawData }) => {
   const [tab, setTab]       = useState('surah');
   const [search, setSearch] = useState('');
 
@@ -219,7 +219,7 @@ const NavigationPanel = ({ visible, currentPage, onGoTo, onClose }) => {
                 >
                   <Text style={styles.hizbJuzNum}>الحزب {item.hizb_number}</Text>
                   <Text style={styles.hizbJuzVerse} numberOfLines={1}>
-                    ﴾{getFirstVerseOfHizb(item.hizb_number)}﴿
+                    ﴾{rawData ? getFirstVerseOfHizb(item.hizb_number, rawData) : ''}﴿
                   </Text>
                   {item.first_page === currentPage && (
                     <View style={styles.activeIndicator} />
@@ -242,7 +242,7 @@ const NavigationPanel = ({ visible, currentPage, onGoTo, onClose }) => {
                 >
                   <Text style={styles.hizbJuzNum}>الجزء {item.juz_number}</Text>
                   <Text style={styles.hizbJuzVerse} numberOfLines={1}>
-                    ﴾{getFirstVerseOfJuz(item.juz_number)}﴿
+                    ﴾{rawData ? getFirstVerseOfJuz(item.juz_number, rawData) : ''}﴿
                   </Text>
                   {item.first_page === currentPage && (
                     <View style={styles.activeIndicator} />
@@ -331,7 +331,7 @@ const BookmarksPanel = ({ visible, bookmarks, onGoTo, onDelete, onClose }) => {
 
 // ── Écran principal ──
 const QuranReadingScreen = ({ navigation }) => {
-  const { rawData: qaloonData } = useQuran();
+  const { rawData: qaloonData, rawData } = useQuran();
   const [fontsLoaded] = useFonts({ ScheherazadeNew_400Regular });
 
   const flatListRef                     = useRef(null);
@@ -379,7 +379,7 @@ const QuranReadingScreen = ({ navigation }) => {
       showToast('تم حذف العلامة المرجعية 🗑️');
     } else {
       newBookmarks = [...bookmarks, currentPage];
-      showToast(`تم حفظ الصفحة ${currentPage} 🔖`);
+      showToast(`تم حفظ الصفحة ${currentPage} ✓`);
     }
     setBookmarks(newBookmarks);
     AsyncStorage.setItem(BOOKMARKS_KEY, JSON.stringify(newBookmarks));
@@ -509,9 +509,12 @@ const QuranReadingScreen = ({ navigation }) => {
 
               {/* Signet (vide ou plein) */}
               <TouchableOpacity style={styles.bookmarkBtn} onPress={handleToggleBookmark}>
-                <Text style={styles.bookmarkBtnIcon}>
-                  {isCurrentPageBookmarked ? '🔖' : '🏷️'}
-                </Text>
+                <Image
+                  source={isCurrentPageBookmarked
+                    ? require('../../assets/bookmark_filled.png')
+                    : require('../../assets/bookmark_empty.png')}
+                  style={styles.bookmarkBtnIcon}
+                />
               </TouchableOpacity>
 
               {/* ☰ → Panneau signets */}
@@ -535,6 +538,7 @@ const QuranReadingScreen = ({ navigation }) => {
         currentPage={currentPage}
         onGoTo={goToPage}
         onClose={() => setNavVisible(false)}
+        rawData={rawData}
       />
 
       {/* Panneau Signets */}
@@ -637,15 +641,19 @@ const styles = StyleSheet.create({
 
   // ── Marque-page ──
   bookmarkMark: { position: 'absolute', top: 2 },
-  bookmarkIcon: { fontSize: 30 },
+  bookmarkIcon: { width: 30, height: 38, resizeMode: 'contain' },
 
   // ── Header overlay ──
   header: {
     position: 'absolute', top: 0, left: 0, right: 0,
-    backgroundColor: C.primary,
-    borderBottomWidth: 1, borderBottomColor: C.gold + '55',
+    backgroundColor: C.primaryDark,
+    borderBottomWidth: 2, borderBottomColor: C.gold + '44',
     zIndex: 10,
-    paddingVertical: 10
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 8,
   },
   headerInner: {
     flexDirection: 'row',
@@ -688,7 +696,7 @@ const styles = StyleSheet.create({
   bookmarkBtn: {
     padding: 8,
   },
-  bookmarkBtnIcon: { fontSize: 20 },
+  bookmarkBtnIcon: { width: 20, height: 60,},
 
   navButton: {
     padding: 8,

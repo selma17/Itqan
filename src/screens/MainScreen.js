@@ -7,7 +7,6 @@ import {
   SafeAreaView,
   StatusBar,
   Clipboard,
-  Image,
   Modal,
   ScrollView,
   FlatList,
@@ -16,9 +15,11 @@ import {
   Share,
   Alert,
   Animated,
+  Image,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import colors from '../styles/colors';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import duaaData from '../data/duaa.json';
 
 const { width } = Dimensions.get('window');
@@ -38,12 +39,12 @@ const SIDE_INSET    = (width - CENTER_W) / 2;
 // ─── Infinite carousel data ──────────────────────────────────────────
 // order: tajweed(0) tadabor(1) tests(2) mutashab(3) duaa(4) errors(5)
 const REAL_SECTIONS = [
-  { id: 'tajweed',  emoji: '🎵', title: 'التجويد',     desc: 'قواعد التلاوة',    accent: false, onPress: () => {} },
-  { id: 'tadabor',  emoji: '📖', title: 'تدبر القرآن', desc: 'تأمّل في الآيات',   accent: false, onPress: () => {} },
-  { id: 'tests',    emoji: '🎯', title: 'الاختبارات',  desc: 'اختبر حفظك',       accent: true,  onPress: null },
-  { id: 'mutashab', emoji: '🔀', title: 'المتشابهات',  desc: 'الآيات المتشابهة', accent: false, onPress: () => {} },
-  { id: 'duaa2',    emoji: '🤲', title: 'أدعية',       desc: 'أدعية مأثورة',     accent: false, onPress: () => {} },
-  { id: 'errors',   emoji: '⚠️', title: 'أخطاؤك',     desc: 'راجع أخطاءك',      accent: false, onPress: () => {} },
+  { id: 'tajweed',  image: require('../../assets/lock.png'),            title: 'التجويد',     desc: 'قريباً', accent: false, onPress: () => {} },
+  { id: 'tadabor',  image: require('../../assets/lock.png'),            title: 'تدبر القرآن', desc: 'قريباً', accent: false, onPress: () => {} },
+  { id: 'tests',    image: require('../../assets/Tests.png'),  title: 'الاختبارات',  desc: 'اختبر حفظك', accent: true, onPress: null },
+  { id: 'mutashab', image: require('../../assets/lock.png'),            title: 'المتشابهات',  desc: 'قريباً', accent: false, onPress: () => {} },
+  { id: 'duaa2',    image: require('../../assets/lock.png'),            title: 'أدعية',       desc: 'قريباً', accent: false, onPress: () => {} },
+  { id: 'errors',   image: require('../../assets/lock.png'),            title: 'أخطاؤك',     desc: 'قريباً', accent: false, onPress: () => {} },
 ];
 const N          = REAL_SECTIONS.length;
 const MULT       = 200;           // enough to never reach the end
@@ -62,6 +63,8 @@ const INITIAL_OFFSET = INITIAL_FLAT * ITEM_WIDTH;
 
 const MainScreen = ({ navigation }) => {
   const [activeTab, setActiveTab]           = useState('home');
+  const [updateModal, setUpdateModal]       = useState(false);
+  const [updateInfo, setUpdateInfo]         = useState(null);
   const [menuVisible, setMenuVisible]       = useState(false);
   const [aboutVisible, setAboutVisible]     = useState(false);
   const [activeRealIndex, setActiveRealIndex] = useState(INITIAL_REAL);
@@ -80,6 +83,40 @@ const MainScreen = ({ navigation }) => {
       setActiveTab('home');
     }, [])
   );
+
+  useEffect(() => {
+    checkForUpdate();
+  }, []);
+
+  const checkForUpdate = async () => {
+    try {
+      const snoozeUntil = await AsyncStorage.getItem('update_snooze_until');
+      console.log('snoozeUntil:', snoozeUntil, 'now:', Date.now());
+      if (snoozeUntil && Date.now() < parseInt(snoozeUntil)) return;
+
+      const res = await fetch('https://raw.githubusercontent.com/selma17/quran-data/main/version.json');      const data = await res.json();
+      console.log('version remote:', data.version, 'local: 1.0.1');
+
+      const appVersion = '1.0.1';
+      if (data.version !== appVersion) {
+        setUpdateInfo(data);
+        setUpdateModal(true);
+      }
+    } catch (e) {
+      console.error('checkForUpdate error:', e);
+    }
+  };
+
+  const handleSnooze = async () => {
+    const tomorrow = Date.now() + 24 * 60 * 60 * 1000;
+    await AsyncStorage.setItem('update_snooze_until', String(tomorrow));
+    setUpdateModal(false);
+  };
+
+  const handleUpdate = async () => {
+    setUpdateModal(false);
+    if (updateInfo?.url) await Linking.openURL(updateInfo.url);
+  };
 
   const randomDuaa = useMemo(() => {
     const d = new Date();
@@ -146,7 +183,7 @@ const MainScreen = ({ navigation }) => {
           <View style={[styles.cornerDiamond, isAccent ? styles.cornerDiamondAccent : styles.cornerDiamondNeutral]} />
 
           <View style={[styles.cardIconWrap, isAccent ? styles.cardIconWrapAccent : styles.cardIconWrapNeutral]}>
-            <Text style={styles.cardEmoji}>{item.emoji}</Text>
+            <Image source={item.image} style={styles.cardIconImage} />
           </View>
 
           <Text style={[styles.cardTitle, isAccent ? styles.cardTitleAccent : styles.cardTitleNeutral]} numberOfLines={1}>
@@ -156,9 +193,11 @@ const MainScreen = ({ navigation }) => {
             {item.desc}
           </Text>
 
-          <View style={[styles.cardArrow, isAccent ? styles.cardArrowAccent : styles.cardArrowNeutral]}>
-            <Text style={[styles.cardArrowTxt, isAccent ? styles.cardArrowTxtAccent : styles.cardArrowTxtNeutral]}>←</Text>
-          </View>
+          {isAccent && (
+            <View style={[styles.cardArrow, styles.cardArrowAccent]}>
+              <Text style={[styles.cardArrowTxt, styles.cardArrowTxtAccent]}>←</Text>
+            </View>
+          )}
         </Animated.View>
       </TouchableOpacity>
     );
@@ -257,7 +296,7 @@ const MainScreen = ({ navigation }) => {
 
         {/* ── INSTRUCTIONS BANNER ── */}
         <View style={styles.instrWrapper}>
-          <TouchableOpacity style={styles.instrBanner} activeOpacity={0.82} onPress={() => {}}>
+          <TouchableOpacity style={styles.instrBanner} activeOpacity={0.82} onPress={() => navigation.navigate('Instructions')}>
             <Text style={styles.instrArrow}>←</Text>
             <Text style={styles.instrText}>تعليمات التطبيق</Text>
           </TouchableOpacity>
@@ -266,24 +305,60 @@ const MainScreen = ({ navigation }) => {
         <View style={{ height: 16 }} />
       </ScrollView>
 
+      {/* ══ UPDATE MODAL ══ */}
+      <Modal visible={updateModal} transparent animationType="fade" onRequestClose={() => setUpdateModal(false)}>
+        <View style={styles.updateOverlay}>
+          <View style={styles.updateCard}>
+            {/* Ornement */}
+            <View style={styles.updateGoldBar} />
+
+            {/* Icône */}
+            <View style={styles.updateIconWrap}>
+              <Text style={styles.updateIcon}>✨</Text>
+            </View>
+
+            <Text style={styles.updateTitle}>تحديث جديد متاح</Text>
+            <Text style={styles.updateVersion}>{updateInfo?.version}</Text>
+
+            <View style={styles.updateDivider} />
+
+            {/* Description */}
+            <Text style={styles.updateDesc}>{updateInfo?.description}</Text>
+
+            <View style={styles.updateDivider} />
+
+            {/* Boutons */}
+            <TouchableOpacity style={styles.updateBtn} onPress={handleUpdate} activeOpacity={0.85}>
+              <Text style={styles.updateBtnText}>تحديث الآن</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.updateLaterBtn} onPress={handleSnooze} activeOpacity={0.7}>
+              <Text style={styles.updateLaterText}>لاحقاً</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       {/* ══ TAB BAR ══ */}
       <View style={styles.tabBar}>
         <TouchableOpacity style={styles.tabItem} onPress={() => handleTabPress('settings')}>
           <View style={[styles.tabIconWrap, activeTab === 'settings' && styles.tabIconWrapActive]}>
-            <Text style={styles.tabIconEmoji}>⚙️</Text>
+            <Image source={require('../../assets/SettingsNobg.png')} style={styles.tabIconImage} />
           </View>
           <Text style={[styles.tabLabel, activeTab === 'settings' && styles.tabLabelActive]}>الإعدادات</Text>
         </TouchableOpacity>
+
         <TouchableOpacity style={[styles.tabItem, styles.tabItemCenter]} onPress={() => handleTabPress('home')}>
           <View style={[styles.tabHomeBtn, activeTab === 'home' && styles.tabHomeBtnActive]}>
-            <Text style={styles.tabHomeIcon}>🏠</Text>
+            <Image source={require('../../assets/homeIconNobg.png')} style={styles.tabHomeImage} />
           </View>
           <Text style={[styles.tabLabel, activeTab === 'home' && styles.tabLabelActive]}>الرئيسية</Text>
           {activeTab === 'home' && <View style={styles.tabActiveDot} />}
         </TouchableOpacity>
+
         <TouchableOpacity style={styles.tabItem} onPress={() => handleTabPress('quran')}>
           <View style={[styles.tabIconWrap, activeTab === 'quran' && styles.tabIconWrapActive]}>
-            <Text style={styles.tabIconEmoji}>📖</Text>
+            <Image source={require('../../assets/QuranReadingScreenNobg.png')} style={styles.tabIconImage} />
           </View>
           <Text style={[styles.tabLabel, activeTab === 'quran' && styles.tabLabelActive]}>المصحف</Text>
         </TouchableOpacity>
@@ -347,7 +422,18 @@ const MainScreen = ({ navigation }) => {
             <View style={styles.aboutDivider} />
             <ScrollView style={styles.aboutContentScroll} showsVerticalScrollIndicator={false}>
               <Text style={styles.aboutText}>
-                بسم الله الرحمن الرحيم{'\n\n'}إتقان هو تطبيق مخصص لاختبار ومراجعة حفظ القرآن الكريم برواية قالون عن نافع المدني.{'\n\n'}يوفر التطبيق عدة أنماط للاختبار:{'\n'}• مواضع في سورة معينة{'\n'}• مواضع في صفحات معينة{'\n'}• مواضع في حزب معيّن{'\n'}• إنشاء اختبار مخصص{'\n\n'}الهدف من التطبيق هو مساعدة حفظة القرآن الكريم على تثبيت حفظهم ومراجعة ما حفظوه بطريقة منظمة وممتعة.{'\n\n'}نسأل الله أن يجعل هذا العمل خالصاً لوجهه الكريم.{'\n\n'}جميع الحقوق محفوظة © 2026
+                بسم الله الرحمن الرحيم{'\n\n'}
+                إتقان هو تطبيق مخصص لاختبار ومراجعة حفظ القرآن الكريم، يدعم عدة روايات: قالون عن نافع، حفص عن عاصم، وورش عن نافع (قريباً).{'\n\n'}
+                يوفر التطبيق عدة أنماط للاختبار:{'\n'}
+                • مواضع في سورة معينة{'\n'}
+                • مواضع في صفحات معينة{'\n'}
+                • مواضع في حزب معيّن{'\n'}
+                • مواضع شاملة من القرآن (أرباع، أنصاف، أثلاث، أسداس){'\n'}
+                • إنشاء اختبار مخصص{'\n\n'}
+                كما يوفر التطبيق مصحفا للقراءة ، تتوفر فيه خاصية التنقل بين السور ، الأجزاء و الأحزاب. مع إمكانية إضافة العديد من العلامات المرجعية و حذفها في أي وقت بطريقة سهلة.
+                {'\n\n'}
+                الهدف من التطبيق هو مساعدة حفظة القرآن الكريم على تثبيت حفظهم ومراجعة ما حفظوه بطريقة منظمة وممتعة.{'\n\n'}
+                نسأل الله أن يجعل هذا العمل خالصاً لوجهه الكريم. 
               </Text>
             </ScrollView>
             <TouchableOpacity style={styles.aboutOkButton} onPress={() => setAboutVisible(false)}>
@@ -415,14 +501,23 @@ const styles = StyleSheet.create({
     position: 'relative',
     paddingBottom: 12,
   },
-  cardAccent: { backgroundColor: colors.primary, shadowColor: colors.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 10, elevation: 8},
+  cardAccent: { 
+    backgroundColor: colors.secondaryLight, 
+    shadowColor: colors.secondaryLight, 
+    shadowOffset: { width: 0, height: 4 }, 
+    shadowOpacity: 1, 
+    shadowRadius: 10, 
+    elevation: 8,
+    borderWidth: 1.5,
+    borderColor: 'rgba(212,175,55,0.35)',
+  },  
   cardNeutral: { backgroundColor: colors.bgPaper, borderWidth: 1.5, borderColor: 'rgba(212,175,55,0.3)', shadowColor: '#000', shadowOffset: { width: 0, height: 5 }, shadowOpacity: 0.09, shadowRadius: 12, elevation: 4 },
 
   cardStripe: { position: 'absolute', top: 0, left: 0, right: 0, height: 4 },
   cardStripeAccent:  { backgroundColor: colors.secondary },
   cardStripeNeutral: { backgroundColor: 'rgba(212,175,55,0.45)' },
 
-  cornerDiamond: { position: 'absolute', top: 10, left: 12, width: 7, height: 7, transform: [{ rotate: '45deg' }] },
+  cornerDiamond: { position: 'absolute', top: 12, left: 12, width: 7, height: 7, transform: [{ rotate: '45deg' }] },
   cornerDiamondAccent:  { backgroundColor: 'rgba(212,175,55,0.4)' },
   cornerDiamondNeutral: { backgroundColor: 'rgba(212,175,55,0.35)' },
 
@@ -430,13 +525,14 @@ const styles = StyleSheet.create({
   cardIconWrapAccent:  { backgroundColor: 'rgba(212,175,55,0.18)' },
   cardIconWrapNeutral: { backgroundColor: 'rgba(45,90,62,0.07)' },
   cardEmoji: { fontSize: 26 },
+  cardIconImage: { width: 50, height: 50, resizeMode: 'contain', borderRadius: 15 },
 
   cardTitle: { fontSize: 16, fontWeight: '800', textAlign: 'center', marginBottom: 3, paddingHorizontal: 6 },
   cardTitleAccent:  { color: colors.secondary },
   cardTitleNeutral: { color: colors.primary },
 
   cardDesc: { fontSize: 11, textAlign: 'center', paddingHorizontal: 6, marginBottom: 14 },
-  cardDescAccent:  { color: 'rgba(255,255,255,0.6)' },
+  cardDescAccent:  { color: 'rgba(58, 56, 56, 0.34)' },
   cardDescNeutral: { color: colors.textSecondary },
 
   cardArrow: { position: 'absolute', bottom: 12, left: 12, width: 26, height: 26, borderRadius: 13, justifyContent: 'center', alignItems: 'center' },
@@ -459,19 +555,25 @@ const styles = StyleSheet.create({
   instrArrow: { fontSize: 15, color: colors.secondary, fontWeight: 'bold' },
 
   // ══ TAB BAR ══
-  tabBar: { flexDirection: 'row', backgroundColor: colors.bgWhite, borderTopWidth: 0.5, borderTopColor: colors.borderLight, paddingBottom: 10, paddingTop: 8, paddingHorizontal: 10, shadowColor: '#000', shadowOffset: { width: 0, height: -3 }, shadowOpacity: 0.06, shadowRadius: 10, elevation: 10 },
-  tabItem: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 2 },
-  tabItemCenter: { marginTop: -18 },
+  tabBar: { flexDirection: 'row', backgroundColor: colors.bgWhite, borderTopWidth: 0.5, borderTopColor: colors.borderLight, paddingBottom: 10, paddingHorizontal: 10, shadowColor: '#000', shadowOffset: { width: 0, height: -3 }, shadowOpacity: 0.06, shadowRadius: 10, elevation: 10 },
+  tabItem: { flex: 1, alignItems: 'center', justifyContent: 'center'},
+  tabItemCenter: { marginTop: -30 },
   tabIconWrap: { width: 40, height: 34, borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
   tabIconWrapActive: { backgroundColor: 'rgba(45,90,62,0.1)' },
   tabIconEmoji: { fontSize: 21 },
-  tabLabel: { fontSize: 10, fontWeight: '500', color: colors.textSecondary },
-  tabLabelActive: { color: colors.primary, fontWeight: '700' },
-  tabHomeBtn: { width: 54, height: 54, borderRadius: 27, backgroundColor: colors.bgLight, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: colors.borderLight, marginBottom: 2, shadowColor: colors.primary, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.12, shadowRadius: 8, elevation: 5 },
-  tabHomeBtnActive: { backgroundColor: colors.primary, borderColor: colors.primary, shadowOpacity: 0.28 },
-  tabHomeIcon: { fontSize: 24 },
+  tabLabel: { fontSize: 14, fontWeight: '500', color: colors.textSecondary, marginTop: 5, },
+  tabLabelActive: { color: colors.primary, fontWeight: '700', marginTop: -5, },
   tabActiveDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.secondary, marginTop: 1 },
+  tabIconImage: {
+    width: 50,
+    height: 50,
+    marginTop: 10,
+  },
+  tabHomeImage: {
+    width: 85,
+    height: 85,
 
+  },
   // ══ MENU ══
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-start', alignItems: 'flex-end' },
   sideMenu: { width: width * 0.6, height: '100%', backgroundColor: colors.bgWhite, shadowColor: '#000', shadowOffset: { width: -4, height: 0 }, shadowOpacity: 0.25, shadowRadius: 10, elevation: 15 },
@@ -487,7 +589,62 @@ const styles = StyleSheet.create({
   menuItemContent: { flexDirection: 'row-reverse', alignItems: 'center', flex: 1, gap: 12 },
   menuItemIcon: { fontSize: 20, width: 28, textAlign: 'center' },
   menuItemText: { flex: 1, fontSize: 16, color: colors.textPrimary, textAlign: 'right' },
-  menuItemArrow: { fontSize: 24, color: colors.textSecondary, marginLeft: 8 },
+  menuItemArrow: { fontSize: 24, color: colors.textSecondary, marginLeft: 8, transform: [{ rotate: '180deg' }],},
+
+  // ══ UPDATE MODAL ══
+  updateOverlay: {
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.65)',
+    justifyContent: 'center', alignItems: 'center', padding: 24,
+  },
+  updateCard: {
+    width: '100%', backgroundColor: colors.bgPaper,
+    borderRadius: 24, overflow: 'hidden',
+    borderWidth: 1.5, borderColor: 'rgba(212,175,55,0.4)',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3, shadowRadius: 16, elevation: 12,
+  },
+  updateGoldBar: { height: 5, backgroundColor: colors.secondary },
+  updateIconWrap: {
+    width: 64, height: 64, borderRadius: 20,
+    backgroundColor: 'rgba(212,175,55,0.12)',
+    justifyContent: 'center', alignItems: 'center',
+    alignSelf: 'center', marginTop: 20, marginBottom: 10,
+    borderWidth: 1.5, borderColor: 'rgba(212,175,55,0.3)',
+  },
+  updateIcon: { fontSize: 28 },
+  updateTitle: {
+    fontSize: 20, fontWeight: '800', color: colors.primary,
+    textAlign: 'center', fontFamily: 'ScheherazadeNew_400Regular',
+    marginBottom: 4,
+  },
+  updateVersion: {
+    fontSize: 13, color: colors.secondary, textAlign: 'center',
+    fontWeight: '700', marginBottom: 12,
+  },
+  updateDivider: { height: 1, backgroundColor: 'rgba(212,175,55,0.2)', marginHorizontal: 16 },
+  updateDesc: {
+    fontSize: 15, color: colors.textPrimary,
+    fontFamily: 'ScheherazadeNew_400Regular',
+    textAlign: 'right', lineHeight: 26,
+    paddingHorizontal: 20, paddingVertical: 14,
+    writingDirection: 'rtl',
+  },
+  updateBtn: {
+    margin: 16, marginBottom: 8,
+    backgroundColor: colors.primary, borderRadius: 14,
+    paddingVertical: 14, alignItems: 'center',
+    shadowColor: colors.primary, shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3, shadowRadius: 8, elevation: 4,
+  },
+  updateBtnText: {
+    fontSize: 17, fontWeight: '700', color: colors.textLight,
+    fontFamily: 'ScheherazadeNew_400Regular',
+  },
+  updateLaterBtn: { paddingVertical: 12, alignItems: 'center', marginBottom: 8 },
+  updateLaterText: {
+    fontSize: 14, color: colors.textSecondary,
+    fontFamily: 'ScheherazadeNew_400Regular',
+  },
 
   // ══ ABOUT MODAL ══
   aboutModalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 20 },

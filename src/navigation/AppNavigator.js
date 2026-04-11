@@ -16,6 +16,7 @@ import QuranReadingScreen from '../screens/QuranReadingScreen';
 import TestsScreen from '../screens/TestsScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import GeneralPartsSelectionScreen from '../screens/GeneralPartsSelectionScreen';
+import InstructionsScreen from '../screens/InstructionsScreen';
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -107,6 +108,11 @@ const AppNavigator = () => {
       <Stack.Screen 
       name="GeneralPartsSelection" 
       component={GeneralPartsSelectionScreen} 
+      />
+
+      <Stack.Screen 
+      name="Instructions" 
+      component={InstructionsScreen} 
       />
         
       </Stack.Navigator>

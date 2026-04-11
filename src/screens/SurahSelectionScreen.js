@@ -187,7 +187,7 @@ const SurahSelectionScreen = ({ navigation }) => {
             disabled={isButtonDisabled}>
             <Text style={styles.startButtonText}>
               {isButtonDisabled 
-                ? (mode === 'sequential' && !questionCount ? 'حدد عدد الأسئلة أولاً' : 'اختر السورة أولاً')
+                ? (mode === 'sequential' && !questionCount ? 'حدد عدد الأسئلة' : 'اختر السورة')
                 : 'بدء الاختبار'
               }
             </Text>
@@ -448,7 +448,6 @@ const styles = StyleSheet.create({
   startButton: {
     backgroundColor: colors.primary,
     paddingVertical: 18,
-    paddingHorizontal: 32,
     borderRadius: 18,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
@@ -464,7 +463,7 @@ const styles = StyleSheet.create({
     elevation: 0,
   },
   startButtonText: {
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: '700',
     color: colors.textLight,
   },

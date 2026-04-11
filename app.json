@@ -13,7 +13,7 @@
     "android": {
       "package": "com.selma.itqan",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/quranIcon.png",
+        "foregroundImage": "./assets/itqanIcon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true

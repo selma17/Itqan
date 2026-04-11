@@ -174,30 +174,36 @@ const SettingsScreen = ({ navigation }) => {
         defaultBundled: r.id === 'qaloon',
       }));
     } else {
-      // Mushaf: hafs bundlé, qaloon téléchargeable, warsh locked, doori masqué
+      // Mushaf: hafs bundlé, qaloon et warsh locked (soon), doori masqué
       return RIWAYAT_LIST
         .filter(r => r.id !== 'doori')
         .map(r => ({
           ...r,
-          locked: r.id === 'warsh',
+          locked: r.id === 'warsh' || r.id === 'qaloon',
           defaultBundled: r.id === 'hafs',
         }));
     }
   };
 
-  const activeRiwaya = modalMode === 'test' ? activeTestRiwaya : activeMushafRiwaya;
+  const handleBackToMain = () => {
+    navigation.goBack();
+  };
 
+  const activeRiwaya = modalMode === 'test' ? activeTestRiwaya : activeMushafRiwaya;
+  console.log('modalVisible:', modalVisible);
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={colors.primaryDark} />
 
       {/* ── HEADER ── */}
       <View style={styles.header}>
-        <View style={{ width: 40 }} />
-        <Text style={styles.headerTitle}>الإعدادات</Text>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+        <TouchableOpacity 
+          style={styles.backBtn} 
+          onPress={() => navigation.pop()}>
           <Text style={styles.backIcon}>›</Text>
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>الإعدادات</Text>
+        <View style={{ width: 40 }} />
       </View>
 
       <ScrollView
@@ -207,15 +213,13 @@ const SettingsScreen = ({ navigation }) => {
       >
 
         {/* ══ RIWAYA ══ */}
-        <Section title="🎙️  الرواية">
+        <Section title="الرواية">
           <Row
-            icon="📖"
             label="رواية الاختبارات"
             value={RIWAYAT[activeTestRiwaya]?.nameAr}
             onPress={() => openModal('test')}
           />
           <Row
-            icon="🕌"
             label="رواية المصحف"
             value={RIWAYAT[activeMushafRiwaya]?.nameAr}
             onPress={() => openModal('mushaf')}
@@ -293,7 +297,7 @@ const SettingsScreen = ({ navigation }) => {
                               onPress={() => !isActive && handleSelect(riwaya.id)}
                             >
                               <Text style={[styles.selectBtnText, isActive && styles.selectBtnTextActive]}>
-                                {isActive ? '✓ مختار' : 'اختر'}
+                                {isActive ? '✓ ' : 'اختر'}
                               </Text>
                             </TouchableOpacity>
                             {!riwaya.defaultBundled && (
@@ -324,12 +328,11 @@ const SettingsScreen = ({ navigation }) => {
         </Modal>
 
         {/* ══ AFFICHAGE ══ */}
-        <Section title="🎨  العرض">
+        <Section title="العرض">
 
           {/* Titre + valeur actuelle */}
           <View style={styles.fontHeader}>
             <View style={styles.rowRightSide}>
-              <Text style={styles.rowIcon}>أ</Text>
               <Text style={styles.rowLabel}>حجم الخط</Text>
             </View>
             <Text style={styles.rowValue}>{currentFont.label}</Text>
@@ -376,36 +379,13 @@ const SettingsScreen = ({ navigation }) => {
         </Section>
 
         {/* ══ STATS ══ */}
-        <Section title="📊  إحصائياتي">
-
-          <View style={styles.statsRow}>
-            <StatCard label="اختبار مجتاز" value="—" color={colors.success} />
-            <StatCard label="اختبار راسب"  value="—" color={colors.error} />
-            <StatCard label="إجمالي"        value="—" color={colors.primary} />
+        <Section title="إحصائياتي">
+          <View style={styles.comingSoonBox}>
+            <Text style={styles.comingSoonTitle}>قريباً في التحديث القادم</Text>
+            <Text style={styles.comingSoonDesc}>
+              ستتمكن من متابعة تقدمك، معرفة أكثر السور اختباراً، ومراكز التأمل في حفظك
+            </Text>
           </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.statsBlock}>
-            <Text style={styles.statsBlockTitle}>أكثر السور اختباراً</Text>
-            <Text style={styles.statsPlaceholder}>— لا توجد بيانات بعد —</Text>
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.statsBlock}>
-            <Text style={styles.statsBlockTitle}>أكثر الأحزاب اختباراً</Text>
-            <Text style={styles.statsPlaceholder}>— لا توجد بيانات بعد —</Text>
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={[styles.statsBlock, { paddingBottom: 16 }]}>
-            <Text style={styles.statsBlockTitle}>مراكز التأمل 🔍</Text>
-            <Text style={styles.statsSubtitle}>المقاطع ذات النتائج الأضعف</Text>
-            <Text style={styles.statsPlaceholder}>— لا توجد بيانات بعد —</Text>
-          </View>
-
         </Section>
 
       </ScrollView>
@@ -421,24 +401,35 @@ const styles = StyleSheet.create({
   // ── HEADER ──
   header: {
     backgroundColor: colors.primary,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    paddingTop: 20,
-  },
+    padding: 20,
+    borderBottomLeftRadius: 35,
+    borderBottomRightRadius: 35,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 10,
+    marginBottom: -20,
+    marginBottom: 10,
+    },
   backBtn: {
     width: 40, height: 40, borderRadius: 20,
     backgroundColor: 'rgba(255,255,255,0.15)',
     justifyContent: 'center', alignItems: 'center',
+    position: 'absolute',
+    top: 40,
+    left: 16,
+    zIndex: 10,
   },
   // En RTL, › pointe vers la droite = retour arrière
-  backIcon: { fontSize: 26, color: colors.textLight },
+  backIcon: { fontSize: 26, color: colors.textLight, transform: [{ rotate: '180deg' }], top: 5 },
   headerTitle: {
-    fontSize: 22, fontWeight: '700',
-    color: colors.textLight,
-    fontFamily: 'ScheherazadeNew_400Regular',
+    fontSize: 28,
+    fontWeight: '800',
+    color: colors.secondary,
+    textAlign: 'center',
+    marginVertical: 20,
+    letterSpacing: 0.5,
   },
 
   // ── SCROLL ──
@@ -480,7 +471,6 @@ const styles = StyleSheet.create({
   rowLast: { borderBottomWidth: 0 },
   rowRightSide: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   rowLeftSide:  { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  rowIcon: { fontSize: 18, width: 26, textAlign: 'center' },
   rowLabel: {
     fontSize: 16, color: colors.textPrimary,
     fontFamily: 'ScheherazadeNew_400Regular',
@@ -581,6 +571,29 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 
+  // ── COMING SOON ──
+  comingSoonBox: {
+    alignItems: 'center',
+    paddingVertical: 28,
+    paddingHorizontal: 20,
+  },
+
+  comingSoonTitle: {
+    fontSize: 16, fontWeight: '700',
+    color: colors.primary,
+    fontFamily: 'ScheherazadeNew_400Regular',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  comingSoonDesc: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    fontFamily: 'ScheherazadeNew_400Regular',
+    textAlign: 'center',
+    lineHeight: 22,
+    writingDirection: 'rtl',
+  },
+
   // ── CONFIRM BTN ──
   confirmBtn: {
     margin: 12, marginTop: 4,
@@ -640,11 +653,12 @@ const styles = StyleSheet.create({
     fontSize: 17, fontWeight: '700',
     color: colors.textPrimary,
     fontFamily: 'ScheherazadeNew_400Regular',
+    
   },
   riwayaNameLocked: { color: colors.textSecondary },
   activeDot: {
     width: 8, height: 8, borderRadius: 4,
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.secondary, marginRight: 20,
   },
   lockBadge: {
     fontSize: 10, color: colors.secondary,
@@ -657,23 +671,25 @@ const styles = StyleSheet.create({
     fontSize: 12, color: colors.textSecondary,
     fontFamily: 'ScheherazadeNew_400Regular',
     textAlign: 'right',
+    marginTop: 3,
   },
   riwayaRegion: {
     fontSize: 11, color: colors.textSecondary,
     fontFamily: 'ScheherazadeNew_400Regular',
-    textAlign: 'right', marginTop: 1,
+    textAlign: 'right', marginTop: 3,
   },
   riwayaSize: {
     fontSize: 10, color: colors.primary,
     fontFamily: 'ScheherazadeNew_400Regular',
-    textAlign: 'right', marginTop: 3,
+    textAlign: 'right', marginTop: 4,
   },
-  riwayaAction: { marginRight: 10 },
-  riwayaButtons: { alignItems: 'center', gap: 6 },
+  riwayaAction: { marginLeft: 14 },
+  riwayaButtons: { alignItems: 'center', gap: 8 },
   selectBtn: {
-    paddingHorizontal: 14, paddingVertical: 7,
+    paddingHorizontal: 18, paddingVertical: 9,
     borderRadius: 10, borderWidth: 1.5,
     borderColor: colors.primary,
+    minWidth: 80, alignItems: 'center',
   },
   selectBtnActive: {
     backgroundColor: colors.primary, borderColor: colors.primary,
@@ -684,24 +700,25 @@ const styles = StyleSheet.create({
   },
   selectBtnTextActive: { color: colors.textLight },
   deleteBtn: {
-    paddingHorizontal: 10, paddingVertical: 5,
+    paddingHorizontal: 14, paddingVertical: 7,
     borderRadius: 8, borderWidth: 1,
     borderColor: colors.error,
+    minWidth: 80, alignItems: 'center',
   },
   deleteBtnText: { fontSize: 13 },
   downloadBtn: {
-    paddingHorizontal: 14, paddingVertical: 7,
+    paddingHorizontal: 18, paddingVertical: 9,
     borderRadius: 10,
     backgroundColor: colors.primary,
+    minWidth: 80, alignItems: 'center',
   },
   downloadBtnText: {
-    fontSize: 13, color: colors.textLight, fontWeight: '600',
+    fontSize: 12, color: colors.textLight, fontWeight: '600',
     fontFamily: 'ScheherazadeNew_400Regular',
   },
-  progressWrap: { alignItems: 'center', gap: 4 },
+  progressWrap: { alignItems: 'center', gap: 6 },
   progressText: {
-    fontSize: 12, color: colors.primary, fontWeight: '700',
-  },
+    fontSize: 12, color: colors.primary, fontWeight: '700', },
 
 });
 

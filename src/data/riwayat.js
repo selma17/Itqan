@@ -20,7 +20,7 @@ export const RIWAYAT = {
     fontFamily: 'HafsFont',
     fontAsset: require('../../assets/fonts/hafs.ttf'),
     bundled: false,
-    downloadUrl: 'https://cdn.jsdelivr.net/gh/selma17/quran-data@main/hafsQuran.json',
+    downloadUrl: 'https://raw.githubusercontent.com/selma17/quran-data/main/hafsQuran.json',
   }, 
 
   warsh: {
@@ -32,7 +32,7 @@ export const RIWAYAT = {
     fontFamily: 'WarshFont',
     fontAsset: require('../../assets/fonts/warsh.ttf'),
     bundled: false,
-    downloadUrl: 'https://cdn.jsdelivr.net/gh/selma17/quran-data@main/warshQuran.json',
+    downloadUrl: 'https://raw.githubusercontent.com/selma17/quran-data/main/warshQuran.json',
   },
   doori: {
     id: 'doori',
@@ -43,7 +43,7 @@ export const RIWAYAT = {
     fontFamily: 'DooriFont',
     fontAsset: require('../../assets/fonts/doori.ttf'),
     bundled: false,
-    downloadUrl: 'https://cdn.jsdelivr.net/gh/selma17/quran-data@main/dooriQuran.json',
+    downloadUrl: 'https://raw.githubusercontent.com/selma17/quran-data/main/dooriQuran.json',
   },
 };
 

@@ -125,8 +125,8 @@ const TestsScreen = ({ navigation }) => {
             <View style={styles.cardGradient} />
             <View style={styles.iconContainer}>
               <Image
-                source={require('../../assets/CustomTesticon.png')}
-                style={styles.cardIconImage}
+                source={require('../../assets/GeneralPartsTest.png')}
+                style={styles.cardGenIconImage}
                 resizeMode="contain"
               />
             </View>
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   backButtonText: {
-    top: 5,
+    top: 7,
     fontSize: 28,
     color: colors.secondary,
     fontWeight: 'bold',
@@ -284,6 +284,12 @@ const styles = StyleSheet.create({
   cardIconImage: {
     width: 63,
     height: 63,
+  },
+  cardGenIconImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 13,
+    margin: 13,
   },
   cardTitle: {
     fontSize: 22,
