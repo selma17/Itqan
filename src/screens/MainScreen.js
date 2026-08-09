@@ -373,7 +373,7 @@ const MainScreen = ({ navigation }) => {
                 <Text style={styles.closeMenuIcon}>✕</Text>
               </TouchableOpacity>
               <Image source={require('../../assets/itqanIconNoBg.png')} style={styles.appIconImage} />
-              <Text style={styles.appVersion}>v1.0.0</Text>
+              <Text style={styles.appVersion}>v1.0.1</Text>
             </View>
             <ScrollView style={styles.menuContent} showsVerticalScrollIndicator={false}>
               <View style={styles.menuSection}>

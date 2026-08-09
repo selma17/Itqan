@@ -10,8 +10,9 @@ import {
   TextInput,
   Alert,
   ToastAndroid, Platform,
+  Modal,
+  Pressable,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import colors from '../styles/colors';
 import quranData from '../data/quranData';
 
@@ -19,6 +20,7 @@ const SurahSelectionScreen = ({ navigation }) => {
   const [selectedSurah, setSelectedSurah] = useState('');
   const [questionCount, setQuestionCount] = useState('');
   const [mode, setMode] = useState('random');
+  const [surahMenuVisible, setSurahMenuVisible] = useState(false);
 
   const handleStartTest = () => {
     if (!selectedSurah) {
@@ -72,27 +74,54 @@ const SurahSelectionScreen = ({ navigation }) => {
             <Text style={styles.label}>اختر السورة:</Text>
             
             <View style={styles.pickerWrapper}>
-              <Picker
-                selectedValue={selectedSurah}
-                onValueChange={(itemValue) => setSelectedSurah(itemValue)}
+              <TouchableOpacity
                 style={styles.picker}
-                dropdownIconColor={colors.primary}
-                mode="dropdown">
-                <Picker.Item 
-                  label="-- سورة --" 
-                  value="" 
-                  style={styles.pickerItem}
-                />
-                {quranData.surahs.map((surah) => (
-                  <Picker.Item
-                    key={surah.number}
-                    label={`${surah.number}. ${surah.name} - ${surah.verses} آية`}
-                    value={surah.number.toString()}
-                    style={styles.pickerItem}
-                  />
-                ))}
-              </Picker>
+                onPress={() => setSurahMenuVisible(true)}
+                activeOpacity={0.7}>
+                <Text style={styles.pickerArrow}>▼</Text>
+                <Text
+                  style={[styles.pickerText, !selectedSurahData && styles.pickerPlaceholder]}
+                  numberOfLines={1}>
+                  {selectedSurahData
+                    ? `${selectedSurahData.number}. ${selectedSurahData.name} - ${selectedSurahData.verses} آية`
+                    : 'اختر السورة'}
+                </Text>
+              </TouchableOpacity>
               <View style={styles.pickerUnderline} />
+
+              <Modal
+                visible={surahMenuVisible}
+                transparent
+                animationType="none"
+                onRequestClose={() => setSurahMenuVisible(false)}>
+                <Pressable
+                  style={styles.modalOverlay}
+                  onPress={() => setSurahMenuVisible(false)}>
+                  <Pressable style={styles.modalSheet}>
+                    <ScrollView>
+                      {quranData.surahs.map((surah) => {
+                        const isSelected = selectedSurah === surah.number.toString();
+                        return (
+                          <TouchableOpacity
+                            key={surah.number}
+                            style={[styles.optionRow, isSelected && styles.optionRowSelected]}
+                            onPress={() => {
+                              setSelectedSurah(surah.number.toString());
+                              setSurahMenuVisible(false);
+                            }}
+                            activeOpacity={0.6}>
+                            <Text
+                              style={[styles.optionText, isSelected && styles.optionTextSelected]}
+                              numberOfLines={1}>
+                              {`${surah.number}. ${surah.name} - ${surah.verses} آية`}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </ScrollView>
+                  </Pressable>
+                </Pressable>
+              </Modal>
             </View>
           </View>
 
@@ -280,11 +309,57 @@ const styles = StyleSheet.create({
   picker: {
     backgroundColor: colors.bgLight,
     borderRadius: 12,
-    color: colors.textPrimary,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
   },
-  pickerItem: {
+  pickerText: {
+    flex: 1,
     fontSize: 16,
+    color: '#2C2C2C',
     textAlign: 'right',
+    writingDirection: 'rtl',
+    marginRight: 8,
+  },
+  pickerPlaceholder: {
+    color: '#9E9E9E',
+  },
+  pickerArrow: {
+    fontSize: 12,
+    color: colors.primary,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    justifyContent: 'center',
+    padding: 30,
+  },
+  modalSheet: {
+    backgroundColor: colors.bgWhite,
+    borderRadius: 16,
+    maxHeight: '70%',
+    overflow: 'hidden',
+  },
+  optionRow: {
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  },
+  optionRowSelected: {
+    backgroundColor: colors.primaryLight,
+  },
+  optionText: {
+    fontSize: 16,
+    color: '#2C2C2C',
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  optionTextSelected: {
+    color: colors.primary,
+    fontWeight: '700',
   },
   pickerUnderline: {
     position: 'absolute',

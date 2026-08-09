@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, SafeAreaView,
   StatusBar, ScrollView, Alert, TextInput, ToastAndroid, Platform,
+  Modal, Pressable,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import colors from '../styles/colors';
 import { useQuran } from '../context/QuranContext';
 
@@ -14,6 +14,7 @@ const HizbSelectionScreen = ({ navigation }) => {
   const [mode, setMode] = useState('random');
   const [hizbInfo, setHizbInfo] = useState(null);
   const [showSurahName, setShowSurahName] = useState(true);
+  const [hizbMenuVisible, setHizbMenuVisible] = useState(false);
 
   useEffect(() => {
     if (selectedHizb) {
@@ -127,23 +128,52 @@ const HizbSelectionScreen = ({ navigation }) => {
           <View style={styles.pickerCard}>
             <Text style={styles.label}>اختر الحزب:</Text>
             <View style={styles.pickerWrapper}>
-              <Picker
-                selectedValue={selectedHizb}
-                onValueChange={(itemValue) => setSelectedHizb(itemValue)}
+              <TouchableOpacity
                 style={styles.picker}
-                dropdownIconColor={colors.primary}
-                mode="dropdown">
-                <Picker.Item label="-- حزب --" value="" style={styles.pickerItem} />
-                {hizbsList.map((hizb) => (
-                  <Picker.Item
-                    key={hizb.number}
-                    label={hizb.label}
-                    value={hizb.number.toString()}
-                    style={styles.pickerItem}
-                  />
-                ))}
-              </Picker>
+                onPress={() => setHizbMenuVisible(true)}
+                activeOpacity={0.7}>
+                <Text style={styles.pickerArrow}>▼</Text>
+                <Text
+                  style={[styles.pickerText, !selectedHizbData && styles.pickerPlaceholder]}
+                  numberOfLines={1}>
+                  {selectedHizbData ? selectedHizbData.label : 'اختر الحزب'}
+                </Text>
+              </TouchableOpacity>
               <View style={styles.pickerUnderline} />
+
+              <Modal
+                visible={hizbMenuVisible}
+                transparent
+                animationType="none"
+                onRequestClose={() => setHizbMenuVisible(false)}>
+                <Pressable
+                  style={styles.modalOverlay}
+                  onPress={() => setHizbMenuVisible(false)}>
+                  <Pressable style={styles.modalSheet}>
+                    <ScrollView>
+                      {hizbsList.map((hizb) => {
+                        const isSelected = selectedHizb === hizb.number.toString();
+                        return (
+                          <TouchableOpacity
+                            key={hizb.number}
+                            style={[styles.optionRow, isSelected && styles.optionRowSelected]}
+                            onPress={() => {
+                              setSelectedHizb(hizb.number.toString());
+                              setHizbMenuVisible(false);
+                            }}
+                            activeOpacity={0.6}>
+                            <Text
+                              style={[styles.optionText, isSelected && styles.optionTextSelected]}
+                              numberOfLines={1}>
+                              {hizb.label}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </ScrollView>
+                  </Pressable>
+                </Pressable>
+              </Modal>
             </View>
           </View>
 
@@ -360,11 +390,57 @@ const styles = StyleSheet.create({
   picker: {
     backgroundColor: colors.bgLight,
     borderRadius: 12,
-    color: colors.textPrimary,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
   },
-  pickerItem: {
+  pickerText: {
+    flex: 1,
     fontSize: 16,
+    color: '#2C2C2C',
     textAlign: 'right',
+    writingDirection: 'rtl',
+    marginRight: 8,
+  },
+  pickerPlaceholder: {
+    color: '#9E9E9E',
+  },
+  pickerArrow: {
+    fontSize: 12,
+    color: colors.primary,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    justifyContent: 'center',
+    padding: 30,
+  },
+  modalSheet: {
+    backgroundColor: colors.bgWhite,
+    borderRadius: 16,
+    maxHeight: '70%',
+    overflow: 'hidden',
+  },
+  optionRow: {
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  },
+  optionRowSelected: {
+    backgroundColor: colors.primaryLight,
+  },
+  optionText: {
+    fontSize: 16,
+    color: '#2C2C2C',
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  optionTextSelected: {
+    color: colors.primary,
+    fontWeight: '700',
   },
   pickerUnderline: {
     position: 'absolute',
