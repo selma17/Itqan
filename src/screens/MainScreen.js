@@ -91,11 +91,9 @@ const MainScreen = ({ navigation }) => {
   const checkForUpdate = async () => {
     try {
       const snoozeUntil = await AsyncStorage.getItem('update_snooze_until');
-      console.log('snoozeUntil:', snoozeUntil, 'now:', Date.now());
       if (snoozeUntil && Date.now() < parseInt(snoozeUntil)) return;
 
       const res = await fetch('https://raw.githubusercontent.com/selma17/quran-data/main/version.json');      const data = await res.json();
-      console.log('version remote:', data.version, 'local: 1.0.1');
 
       const appVersion = '1.0.1';
       if (data.version !== appVersion) {

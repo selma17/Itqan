@@ -12,9 +12,6 @@ import navIndex from '../data/quranIndex.json';
 import { useQuran } from '../context/QuranContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts, ScheherazadeNew_400Regular } from '@expo-google-fonts/scheherazade-new';
-console.log('navIndex surahs:', navIndex?.surahs?.length);
-console.log('navIndex hizbs:', navIndex?.hizbs?.length);
-console.log('navIndex juzs:', navIndex?.juzs?.length);
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 
@@ -138,8 +135,6 @@ const NavigationPanel = ({ visible, currentPage, onGoTo, onClose, rawData }) => 
     navIndex.juzs.filter(j => String(j.juz_number).includes(search)),
     [search]);
 
-  console.log('NavigationPanel visible:', visible, 'tab:', tab);
-  console.log('filteredSurahs:', filteredSurahs?.length);
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <TouchableOpacity style={styles.panelBackdrop} activeOpacity={1} onPress={onClose} />

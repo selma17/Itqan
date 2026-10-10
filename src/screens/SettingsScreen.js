@@ -190,7 +190,6 @@ const SettingsScreen = ({ navigation }) => {
   };
 
   const activeRiwaya = modalMode === 'test' ? activeTestRiwaya : activeMushafRiwaya;
-  console.log('modalVisible:', modalVisible);
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={colors.primaryDark} />

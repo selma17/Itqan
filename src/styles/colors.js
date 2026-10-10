@@ -17,7 +17,9 @@ export const colors = {
   
   success: '#2d5a3e',          
   error: '#c94c4c',        
-  warning: '#f0ad4e',          
+  successLight: 'rgba(45, 90, 62, 0.1)',
+  errorLight: 'rgba(201, 76, 76, 0.1)',
+  warning: '#f0ad4e',        
   info: '#5bc0de',              
   
   overlay: 'rgba(0, 0, 0, 0.5)',                 
