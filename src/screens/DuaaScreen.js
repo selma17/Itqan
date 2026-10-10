@@ -9,6 +9,7 @@ import {
   ScrollView,
 } from 'react-native';
 import colors from '../styles/colors';
+import { PaperclipIcon } from '../icones';
 import { useQuran } from '../context/QuranContext';
 
 const DuaaScreen = ({ navigation, route }) => {
@@ -146,7 +147,7 @@ const DuaaScreen = ({ navigation, route }) => {
         </View>
 
         <View style={styles.testInfoCard}>
-          <Text style={styles.testInfoIcon}>🖇️</Text>
+          <PaperclipIcon size={22} color={colors.primary} />
           <Text style={styles.testInfoTitle}>
             {getTestInfo()}
           </Text>
@@ -187,7 +188,6 @@ const styles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 23,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 12,
@@ -201,14 +201,15 @@ const styles = StyleSheet.create({
   },
   headerContent: {
     flex: 1,
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    paddingRight: 58,
   },
   headerTitle: {
     fontSize: 25,
     fontWeight: '700',
     color: colors.textLight,
     marginTop: 25,
-    marginRight: 15
+    textAlign: 'center',
   },
   
   scrollView: {
@@ -291,9 +292,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
     alignItems: 'center',
     gap: 10,
-  },
-  testInfoIcon: {
-    fontSize: 22,
   },
   testInfoTitle: {
     flex: 1,

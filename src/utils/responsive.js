@@ -11,6 +11,12 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BASE_WIDTH = 375;
 const BASE_HEIGHT = 812;
 
+// Plafond du facteur d'échelle : évite que tout soit démesuré sur tablette
+// (sans effet sur les téléphones, dont le facteur reste sous ce plafond).
+const MAX_SCALE = 1.3;
+const widthScale = Math.min(SCREEN_WIDTH / BASE_WIDTH, MAX_SCALE);
+const heightScale = Math.min(SCREEN_HEIGHT / BASE_HEIGHT, MAX_SCALE);
+
 /**
  * Width Percentage
  * Convertit une taille en pourcentage de la largeur de l'écran
@@ -20,7 +26,7 @@ const BASE_HEIGHT = 812;
  * Utilisation : width, marginLeft, marginRight, paddingHorizontal, borderRadius
  */
 export const wp = (size) => {
-  return (SCREEN_WIDTH / BASE_WIDTH) * size;
+  return widthScale * size;
 };
 
 /**
@@ -32,7 +38,7 @@ export const wp = (size) => {
  * Utilisation : height, marginTop, marginBottom, paddingVertical
  */
 export const hp = (size) => {
-  return (SCREEN_HEIGHT / BASE_HEIGHT) * size;
+  return heightScale * size;
 };
 
 /**
@@ -45,8 +51,7 @@ export const hp = (size) => {
  * Note : Utilise la largeur comme référence (plus stable que la hauteur)
  */
 export const fp = (size) => {
-  const scale = SCREEN_WIDTH / BASE_WIDTH;
-  const newSize = size * scale;
+  const newSize = size * widthScale;
   // Arrondi pour éviter les demi-pixels
   return Math.round(newSize);
 };
@@ -60,12 +65,15 @@ export const fp = (size) => {
  * Utilisation : margin, padding (quand on veut un espacement uniforme)
  */
 export const sp = (size) => {
-  return (SCREEN_WIDTH / BASE_WIDTH) * size;
+  return widthScale * size;
 };
 
 /**
  * Informations sur l'écran actuel
  */
+// Largeur max du contenu principal (centré sur tablette)
+export const CONTENT_MAX_WIDTH = 640;
+
 export const SCREEN = {
   width: SCREEN_WIDTH,
   height: SCREEN_HEIGHT,

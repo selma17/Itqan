@@ -14,6 +14,7 @@ import {
   getActiveMushafRiwaya, setActiveMushafRiwaya,
 } from '../utils/riwayaManager';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { STORAGE_KEYS } from '../services/storage';
 
 const { width } = Dimensions.get('window');
 
@@ -84,7 +85,7 @@ const SettingsScreen = ({ navigation }) => {
   // Charger état initial
   useEffect(() => {
     const init = async () => {
-      const savedStep = await AsyncStorage.getItem('verse_font_step');
+      const savedStep = await AsyncStorage.getItem(STORAGE_KEYS.VERSE_FONT_STEP);
       if (savedStep !== null) {
         setFontStep(Number(savedStep));
         setSavedFontStep(Number(savedStep));
@@ -190,7 +191,6 @@ const SettingsScreen = ({ navigation }) => {
   };
 
   const activeRiwaya = modalMode === 'test' ? activeTestRiwaya : activeMushafRiwaya;
-  console.log('modalVisible:', modalVisible);
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={colors.primaryDark} />
@@ -368,7 +368,7 @@ const SettingsScreen = ({ navigation }) => {
             <TouchableOpacity
               style={styles.confirmBtn}
               onPress={async () => {
-                await AsyncStorage.setItem('verse_font_step', String(fontStep));
+                await AsyncStorage.setItem(STORAGE_KEYS.VERSE_FONT_STEP, String(fontStep));
                 setSavedFontStep(fontStep);
               }}
             >

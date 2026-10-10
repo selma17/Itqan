@@ -10,13 +10,16 @@ export const colors = {
   textPrimary: '#1a2b1f',     
   textSecondary: '#4a5f54',    
   textLight: '#ffffff',     
+  placeholder: '#B5B5B5',
   
   border: '#d4c4a8',            
   borderLight: '#e8e4d8',  
   
   success: '#2d5a3e',          
   error: '#c94c4c',        
-  warning: '#f0ad4e',          
+  successLight: 'rgba(45, 90, 62, 0.1)',
+  errorLight: 'rgba(201, 76, 76, 0.1)',
+  warning: '#f0ad4e',        
   info: '#5bc0de',              
   
   overlay: 'rgba(0, 0, 0, 0.5)',                 

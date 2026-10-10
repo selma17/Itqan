@@ -29,21 +29,13 @@ export const downloadRiwaya = async (riwayaId, onProgress) => {
   const downloadResumable = FileSystem.createDownloadResumable(
     riwaya.downloadUrl,
     localPath,
-    {
-        headers: {
-        'Accept': 'application/octet-stream',
-        }
-    },
+    { headers: { 'Accept': 'application/octet-stream' } },
     ({ totalBytesWritten, totalBytesExpectedToWrite }) => {
-        if (onProgress && totalBytesExpectedToWrite > 0) {
+      if (onProgress && totalBytesExpectedToWrite > 0) {
         onProgress(totalBytesWritten / totalBytesExpectedToWrite);
-        }
+      }
     }
-    );
-
-    console.log('Downloading from:', riwaya.downloadUrl);
-    const result = await downloadResumable.downloadAsync();
-    console.log('Download result:', result);
+  );
 
   try {
     const result = await downloadResumable.downloadAsync();
