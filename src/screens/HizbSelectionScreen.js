@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, SafeAreaView,
   StatusBar, ScrollView, Alert, TextInput, ToastAndroid, Platform,
-  Modal, Pressable,
 } from 'react-native';
 import colors from '../styles/colors';
+import BottomSheetSelect from '../components/BottomSheetSelect';
 import { useQuran } from '../context/QuranContext';
 
 const HizbSelectionScreen = ({ navigation }) => {
@@ -14,7 +14,6 @@ const HizbSelectionScreen = ({ navigation }) => {
   const [mode, setMode] = useState('random');
   const [hizbInfo, setHizbInfo] = useState(null);
   const [showSurahName, setShowSurahName] = useState(true);
-  const [hizbMenuVisible, setHizbMenuVisible] = useState(false);
 
   useEffect(() => {
     if (selectedHizb) {
@@ -99,6 +98,7 @@ const HizbSelectionScreen = ({ navigation }) => {
     number: i + 1,
     label: `الحزب ${i + 1}`
   }));
+  const hizbOptions = hizbsList.map(h => ({ value: h.number.toString(), label: h.label, badge: h.number }));
 
   const selectedHizbData = selectedHizb
     ? hizbsList.find(h => h.number === parseInt(selectedHizb))
@@ -115,7 +115,7 @@ const HizbSelectionScreen = ({ navigation }) => {
           <Text style={styles.backButtonText}>⬅</Text>
         </TouchableOpacity>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>اختبار حسب الحزب</Text>
+          <Text style={styles.headerTitle}>مواضع من حزب </Text>
         </View>
       </View>
 
@@ -126,55 +126,14 @@ const HizbSelectionScreen = ({ navigation }) => {
         
         <View style={styles.content}>
           <View style={styles.pickerCard}>
-            <Text style={styles.label}>اختر الحزب:</Text>
-            <View style={styles.pickerWrapper}>
-              <TouchableOpacity
-                style={styles.picker}
-                onPress={() => setHizbMenuVisible(true)}
-                activeOpacity={0.7}>
-                <Text style={styles.pickerArrow}>▼</Text>
-                <Text
-                  style={[styles.pickerText, !selectedHizbData && styles.pickerPlaceholder]}
-                  numberOfLines={1}>
-                  {selectedHizbData ? selectedHizbData.label : 'اختر الحزب'}
-                </Text>
-              </TouchableOpacity>
-              <View style={styles.pickerUnderline} />
-
-              <Modal
-                visible={hizbMenuVisible}
-                transparent
-                animationType="none"
-                onRequestClose={() => setHizbMenuVisible(false)}>
-                <Pressable
-                  style={styles.modalOverlay}
-                  onPress={() => setHizbMenuVisible(false)}>
-                  <Pressable style={styles.modalSheet}>
-                    <ScrollView>
-                      {hizbsList.map((hizb) => {
-                        const isSelected = selectedHizb === hizb.number.toString();
-                        return (
-                          <TouchableOpacity
-                            key={hizb.number}
-                            style={[styles.optionRow, isSelected && styles.optionRowSelected]}
-                            onPress={() => {
-                              setSelectedHizb(hizb.number.toString());
-                              setHizbMenuVisible(false);
-                            }}
-                            activeOpacity={0.6}>
-                            <Text
-                              style={[styles.optionText, isSelected && styles.optionTextSelected]}
-                              numberOfLines={1}>
-                              {hizb.label}
-                            </Text>
-                          </TouchableOpacity>
-                        );
-                      })}
-                    </ScrollView>
-                  </Pressable>
-                </Pressable>
-              </Modal>
-            </View>
+            <BottomSheetSelect
+              label="الحزب"
+              placeholder="اختر الحزب"
+              title="اختر الحزب"
+              options={hizbOptions}
+              value={selectedHizb}
+              onChange={setSelectedHizb}
+            />
           </View>
 
           <View style={styles.section}>
@@ -214,12 +173,12 @@ const HizbSelectionScreen = ({ navigation }) => {
               عدد الأسئلة
             </Text>
             <TextInput
-              style={styles.numberInput}
+              style={[styles.numberInput, !questionCount && styles.inputEmpty]}
               keyboardType="numeric"
               value={questionCount}
               onChangeText={setQuestionCount}
-              placeholder=" -- "
-              placeholderTextColor={colors.textSecondary}
+              placeholder="مثال: 10"
+              placeholderTextColor={colors.placeholder}
               textAlign="center"
             />
           </View>
@@ -316,7 +275,7 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: colors.primary,
     paddingTop: 20,
-    paddingBottom: 30,
+    paddingBottom: 22,
     paddingHorizontal: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
@@ -333,7 +292,6 @@ const styles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 23,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 12,
@@ -346,29 +304,30 @@ const styles = StyleSheet.create({
   },
   headerContent: {
     flex: 1,
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    paddingRight: 58,
   },
   headerTitle: {
     fontSize: 25,
     fontWeight: '700',
     color: colors.textLight,
-    marginRight: 15,
+    textAlign: 'center',
     marginTop: 30,
   },
   scrollView: {
     flex: 1,
   },
   scrollViewContent: {
-    paddingBottom: 30,
+    paddingBottom: 20,
   },
   content: {
-    padding: 20,
+    padding: 14,
   },
   pickerCard: {
     backgroundColor: colors.bgWhite,
     borderRadius: 20,
-    padding: 15,
-    marginBottom: 15,
+    padding: 12,
+    marginBottom: 10,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.08,
@@ -381,80 +340,13 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     color: colors.primary,
-    marginBottom: 5,
+    marginBottom: 2,
     textAlign: 'right',
-  },
-  pickerWrapper: {
-    position: 'relative',
-  },
-  picker: {
-    backgroundColor: colors.bgLight,
-    borderRadius: 12,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-  },
-  pickerText: {
-    flex: 1,
-    fontSize: 16,
-    color: '#2C2C2C',
-    textAlign: 'right',
-    writingDirection: 'rtl',
-    marginRight: 8,
-  },
-  pickerPlaceholder: {
-    color: '#9E9E9E',
-  },
-  pickerArrow: {
-    fontSize: 12,
-    color: colors.primary,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.35)',
-    justifyContent: 'center',
-    padding: 30,
-  },
-  modalSheet: {
-    backgroundColor: colors.bgWhite,
-    borderRadius: 16,
-    maxHeight: '70%',
-    overflow: 'hidden',
-  },
-  optionRow: {
-    paddingVertical: 14,
-    paddingHorizontal: 18,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
-  },
-  optionRowSelected: {
-    backgroundColor: colors.primaryLight,
-  },
-  optionText: {
-    fontSize: 16,
-    color: '#2C2C2C',
-    textAlign: 'right',
-    writingDirection: 'rtl',
-  },
-  optionTextSelected: {
-    color: colors.primary,
-    fontWeight: '700',
-  },
-  pickerUnderline: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 2,
-    backgroundColor: colors.secondary,
-    borderRadius: 1,
   },
   numberInput: {
     backgroundColor: colors.bgLight,
-    borderRadius: 14,
-    padding: 10,
+    borderRadius: 12,
+    padding: 5,
     fontSize: 20,
     textAlign: 'center',
     borderWidth: 1,
@@ -465,8 +357,8 @@ const styles = StyleSheet.create({
   section: {
     backgroundColor: colors.bgWhite,
     borderRadius: 20,
-    padding: 15,
-    marginBottom: 15,
+    padding: 12,
+    marginBottom: 10,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.08,
@@ -479,18 +371,18 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     color: colors.primary,
-    marginBottom: 5,
+    marginBottom: 2,
     textAlign: 'right',
   },
   radioGroup: {
-    gap: 5,
+    gap: 3,
   },
   radioButton: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
     backgroundColor: colors.bgLight,
     borderRadius: 14,
-    padding: 10,
+    padding: 8,
     borderWidth: 2,
     borderColor: 'transparent',
   },
@@ -499,9 +391,9 @@ const styles = StyleSheet.create({
     borderColor: colors.secondary,
   },
   radio: {
-    width: 24, 
-    height: 24, 
-    borderRadius: 12, 
+    width: 20, 
+    height: 20, 
+    borderRadius: 10, 
     borderWidth: 2, 
     borderColor: colors.textSecondary,
     justifyContent: 'center', 
@@ -512,9 +404,9 @@ const styles = StyleSheet.create({
     borderColor: colors.primary 
   },
   radioInner: { 
-    width: 12, 
-    height: 12, 
-    borderRadius: 6, 
+    width: 10, 
+    height: 10, 
+    borderRadius: 5, 
     backgroundColor: colors.primary 
   },
   radioText: {
@@ -552,8 +444,8 @@ const styles = StyleSheet.create({
   hizbInfoCard: {
     backgroundColor: colors.primaryLight, 
     borderRadius: 20, 
-    padding: 20, 
-    marginBottom: 24,
+    padding: 12, 
+    marginBottom: 10,
     borderWidth: 2, 
     borderColor: colors.secondary,
   },
@@ -591,10 +483,10 @@ const styles = StyleSheet.create({
   },
   hizbDetailsContainer: {
     marginTop: 5,
-    paddingTop: 12,
+    paddingTop: 8,
     borderTopWidth: 3,
     borderTopColor: colors.borderLight,
-    gap: 8,
+    gap: 5,
   },
   hizbDetailRow: {
     flexDirection: 'row-reverse',
@@ -618,7 +510,7 @@ const styles = StyleSheet.create({
   },
   startButton: {
     backgroundColor: colors.primary, 
-    paddingVertical: 18, 
+    paddingVertical: 12, 
     paddingHorizontal: 32,
     borderRadius: 18, 
     shadowColor: colors.primary, 
@@ -635,9 +527,13 @@ const styles = StyleSheet.create({
     elevation: 0 
   },
   startButtonText: { 
-    fontSize: 20, 
+    fontSize: 18, 
     fontWeight: '700', 
     color: colors.textLight 
+  },
+  inputEmpty: {
+    fontSize: 14,
+    fontWeight: '400',
   },
 });
 

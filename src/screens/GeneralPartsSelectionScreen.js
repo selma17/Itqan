@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import colors from '../styles/colors';
 import { useQuran } from '../context/QuranContext';
+import BottomSheetSelect from '../components/BottomSheetSelect';
 
 // Définition des parties et leurs plages de hizbs (hizbs 1-60)
 const PARTS = {
@@ -40,7 +41,7 @@ const CATEGORY_LABELS = {
   sixths:   'الأسداس',
 };
 
-const getPartInfo = (part) => {
+const getPartInfo = (part, quranData) => {
   try {
     if (!Array.isArray(quranData)) return null;
 
@@ -90,11 +91,11 @@ const GeneralPartsSelectionScreen = ({ navigation }) => {
 
   useEffect(() => {
     if (selectedPart) {
-      setPartInfo(getPartInfo(selectedPart));
+      setPartInfo(getPartInfo(selectedPart, quranData));
     } else {
       setPartInfo(null);
     }
-  }, [selectedPart]);
+  }, [selectedPart, quranData]);
 
   const handleStartTest = () => {
     if (!selectedPart) {
@@ -121,6 +122,8 @@ const GeneralPartsSelectionScreen = ({ navigation }) => {
     (mode === 'sequential' && (!questionCount || parseInt(questionCount) <= 0));
 
   const currentParts = PARTS[selectedCategory];
+  const categoryOptions = Object.keys(PARTS).map(cat => ({ value: cat, label: CATEGORY_LABELS[cat] }));
+  const partOptions = currentParts.map(part => ({ value: String(part.id), label: part.label }));
 
   return (
     <SafeAreaView style={styles.container}>
@@ -131,7 +134,7 @@ const GeneralPartsSelectionScreen = ({ navigation }) => {
           <Text style={styles.backButtonText}>⬅</Text>
         </TouchableOpacity>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>اختبار حسب الأجزاء</Text>
+          <Text style={styles.headerTitle}>مواضع من أجزاء</Text>
         </View>
       </View>
 
@@ -142,45 +145,23 @@ const GeneralPartsSelectionScreen = ({ navigation }) => {
 
         <View style={styles.content}>
 
-          {/* Sélection de la catégorie */}
+          {/* Catégorie + partie */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>نوع التقسيم</Text>
-            <View style={styles.categoryRow}>
-              {Object.keys(PARTS).map(cat => (
-                <TouchableOpacity
-                  key={cat}
-                  style={[styles.categoryButton, selectedCategory === cat && styles.categoryButtonActive]}
-                  onPress={() => setSelectedCategory(cat)}>
-                  <Text style={[styles.categoryText, selectedCategory === cat && styles.categoryTextActive]}>
-                    {CATEGORY_LABELS[cat]}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          {/* Sélection de la partie */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>اختر الجزء</Text>
-            <View style={styles.partsGrid}>
-              {currentParts.map(part => (
-                <TouchableOpacity
-                  key={part.id}
-                  style={[
-                    styles.partButton,
-                    selectedPart?.id === part.id && selectedPart?.hizbFrom === part.hizbFrom
-                      && styles.partButtonActive,
-                  ]}
-                  onPress={() => setSelectedPart(part)}>
-                  <Text style={[
-                    styles.partText,
-                    selectedPart?.id === part.id && selectedPart?.hizbFrom === part.hizbFrom
-                      && styles.partTextActive,
-                  ]}>
-                    {part.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+            <View style={styles.fieldGap}>
+              <BottomSheetSelect
+                label="نوع التقسيم"
+                placeholder="اختر نوع التقسيم"
+                options={categoryOptions}
+                value={selectedCategory}
+                onChange={setSelectedCategory}
+              />
+              <BottomSheetSelect
+                label="الجزء"
+                placeholder="اختر الجزء"
+                options={partOptions}
+                value={selectedPart ? String(selectedPart.id) : null}
+                onChange={(id) => setSelectedPart(currentParts.find(p => String(p.id) === id))}
+              />
             </View>
           </View>
 
@@ -244,12 +225,12 @@ const GeneralPartsSelectionScreen = ({ navigation }) => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>عدد الأسئلة</Text>
             <TextInput
-              style={styles.numberInput}
+              style={[styles.numberInput, !questionCount && styles.inputEmpty]}
               keyboardType="numeric"
               value={questionCount}
               onChangeText={setQuestionCount}
-              placeholder=" -- "
-              placeholderTextColor={colors.textSecondary}
+              placeholder="مثال: 10"
+              placeholderTextColor={colors.placeholder}
               textAlign="center"
             />
           </View>
@@ -301,7 +282,7 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: colors.primary,
     paddingTop: 20,
-    paddingBottom: 30,
+    paddingBottom: 22,
     paddingHorizontal: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
@@ -318,23 +299,26 @@ const styles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 23,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 12,
   },
   backButtonText: { fontSize: 25, color: colors.textLight, fontWeight: 'bold', marginBottom: 20 },
-  headerContent: { flex: 1, alignItems: 'flex-end' },
-  headerTitle: { fontSize: 25, fontWeight: '700', color: colors.textLight, marginRight: 15, marginTop: 30 },
+  headerContent: {
+    flex: 1,
+    alignItems: 'center',
+    paddingRight: 58,
+  },
+  headerTitle: { fontSize: 25, fontWeight: '700', color: colors.textLight, textAlign: 'center', marginTop: 30 },
   scrollView: { flex: 1 },
-  scrollViewContent: { paddingBottom: 30 },
-  content: { padding: 20 },
+  scrollViewContent: { paddingBottom: 20 },
+  content: { padding: 14 },
 
   section: {
     backgroundColor: colors.bgWhite,
     borderRadius: 20,
-    padding: 15,
-    marginBottom: 15,
+    padding: 12,
+    marginBottom: 10,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.08,
@@ -343,76 +327,48 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.borderLight,
   },
-  sectionTitle: { fontSize: 17, fontWeight: '600', color: colors.primary, marginBottom: 10, textAlign: 'right' },
+  sectionTitle: { fontSize: 17, fontWeight: '600', color: colors.primary, marginBottom: 2, textAlign: 'right' },
 
-  // Catégories
-  categoryRow: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 },
-  categoryButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    backgroundColor: colors.bgLight,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  categoryButtonActive: { backgroundColor: colors.primaryLight, borderColor: colors.secondary },
-  categoryText: { fontSize: 15, fontWeight: '600', color: colors.textPrimary },
-  categoryTextActive: { color: colors.primary },
-
-  // Grille des parties
-  partsGrid: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 },
-  partButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 14,
-    backgroundColor: colors.bgLight,
-    borderWidth: 2,
-    borderColor: 'transparent',
-    minWidth: '45%',
-    alignItems: 'center',
-  },
-  partButtonActive: { backgroundColor: colors.primaryLight, borderColor: colors.secondary },
-  partText: { fontSize: 15, fontWeight: '600', color: colors.textPrimary, textAlign: 'center' },
-  partTextActive: { color: colors.primary },
+  fieldGap: { gap: 6 },
 
   // Info card
   infoCard: {
     backgroundColor: colors.primaryLight,
     borderRadius: 20,
-    padding: 20,
-    marginBottom: 15,
+    padding: 12,
+    marginBottom: 10,
     borderWidth: 2,
     borderColor: colors.secondary,
   },
-  infoCardTitle: { fontSize: 22, fontWeight: '700', color: colors.primary, textAlign: 'right', marginBottom: 10 },
-  infoDetailsContainer: { borderTopWidth: 2, borderTopColor: colors.borderLight, paddingTop: 10, gap: 8 },
+  infoCardTitle: { fontSize: 22, fontWeight: '700', color: colors.primary, textAlign: 'right', marginBottom: 6 },
+  infoDetailsContainer: { borderTopWidth: 2, borderTopColor: colors.borderLight, paddingTop: 8, gap: 5 },
   infoDetailRow: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'flex-start', gap: 5 },
   infoDetailLabel: { fontSize: 14, fontWeight: '600', color: colors.primary, minWidth: 70, textAlign: 'right' },
   infoDetailValue: { fontSize: 14, color: colors.textSecondary, flex: 1, textAlign: 'right', flexWrap: 'wrap' },
 
   // Radio
-  radioGroup: { gap: 5 },
+  radioGroup: { gap: 3 },
   radioButton: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
     backgroundColor: colors.bgLight,
     borderRadius: 14,
-    padding: 10,
+    padding: 8,
     borderWidth: 2,
     borderColor: 'transparent',
   },
   radioButtonActive: { backgroundColor: colors.primaryLight, borderColor: colors.secondary },
-  radio: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: colors.textSecondary, justifyContent: 'center', alignItems: 'center', marginLeft: 12 },
+  radio: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: colors.textSecondary, justifyContent: 'center', alignItems: 'center', marginLeft: 12 },
   radioActive: { borderColor: colors.primary },
-  radioInner: { width: 12, height: 12, borderRadius: 6, backgroundColor: colors.primary },
+  radioInner: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.primary },
   radioText: { flex: 1, fontSize: 16, color: colors.textPrimary, textAlign: 'right', fontWeight: '500' },
   radioTextActive: { color: colors.primary, fontWeight: '600' },
 
   // Input
   numberInput: {
     backgroundColor: colors.bgLight,
-    borderRadius: 14,
-    padding: 10,
+    borderRadius: 12,
+    padding: 5,
     fontSize: 20,
     textAlign: 'center',
     borderWidth: 1,
@@ -424,7 +380,7 @@ const styles = StyleSheet.create({
   // Bouton
   startButton: {
     backgroundColor: colors.primary,
-    paddingVertical: 18,
+    paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 18,
     shadowColor: colors.primary,
@@ -434,10 +390,14 @@ const styles = StyleSheet.create({
     elevation: 6,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 5,
+    marginTop: 2,
   },
   startButtonDisabled: { backgroundColor: colors.textSecondary, shadowOpacity: 0, elevation: 0 },
-  startButtonText: { fontSize: 20, fontWeight: '700', color: colors.textLight },
+  startButtonText: { fontSize: 18, fontWeight: '700', color: colors.textLight },
+  inputEmpty: {
+    fontSize: 14,
+    fontWeight: '400',
+  },
 });
 
 export default GeneralPartsSelectionScreen;

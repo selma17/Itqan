@@ -75,9 +75,6 @@ const TestsScreen = ({ navigation }) => {
             </View>
             <Text style={styles.cardTitle}>مواضع في سورة معينة</Text>
             <Text style={styles.cardDescription}>اختر سورة واختبر حفظك آياتها</Text>
-            <View style={styles.cardArrow}>
-              <Text style={styles.arrowText}>←</Text>
-            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -94,9 +91,6 @@ const TestsScreen = ({ navigation }) => {
             </View>
             <Text style={styles.cardTitle}>مواضع في صفحات معينة</Text>
             <Text style={styles.cardDescription}>حدد نطاق الصفحات من المصحف</Text>
-            <View style={styles.cardArrow}>
-              <Text style={styles.arrowText}>←</Text>
-            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -113,9 +107,6 @@ const TestsScreen = ({ navigation }) => {
             </View>
             <Text style={styles.cardTitle}>مواضع في حزب معيّن</Text>
             <Text style={styles.cardDescription}>اختر حزب واختبر حفظك فيه</Text>
-            <View style={styles.cardArrow}>
-              <Text style={styles.arrowText}>←</Text>
-            </View>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -132,9 +123,6 @@ const TestsScreen = ({ navigation }) => {
             </View>
             <Text style={styles.cardTitle}>مواضع شاملة من القرآن</Text>
             <Text style={styles.cardDescription}>إختبارات في أنصاف و أرباع القرآن</Text>
-            <View style={styles.cardArrow}>
-              <Text style={styles.arrowText}>←</Text>
-            </View>
           </TouchableOpacity>
 
 
@@ -152,9 +140,6 @@ const TestsScreen = ({ navigation }) => {
             </View>
             <Text style={styles.cardTitle}>أنشئ اختبارك الخاصّ</Text>
             <Text style={styles.cardDescription}>خصّص اختبارك وابدأ التحدّي بطريقتك</Text>
-            <View style={styles.cardArrow}>
-              <Text style={styles.arrowText}>←</Text>
-            </View>
           </TouchableOpacity>
 
         </View>
@@ -227,7 +212,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,
-    backgroundColor: 'rgba(255,255,255,0.15)',
     borderRadius: 12,
   },
   backButtonText: {
@@ -305,22 +289,6 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     lineHeight: 24,
     marginBottom: 12,
-  },
-  cardArrow: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.primaryLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  arrowText: {
-    fontSize: 20,
-    color: colors.primary,
-    fontWeight: 'bold',
   },
 });
 

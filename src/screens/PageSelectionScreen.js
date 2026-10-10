@@ -63,7 +63,7 @@ const PageSelectionScreen = ({ navigation }) => {
           <Text style={styles.backButtonText}>⬅</Text>
         </TouchableOpacity>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>مواضع في صفحات معينة</Text>
+          <Text style={styles.headerTitle}>مواضع من صفحات</Text>
         </View>
       </View>
 
@@ -84,15 +84,15 @@ const PageSelectionScreen = ({ navigation }) => {
             <View style={styles.inputGroup}>
               <View style={styles.inputContainer}>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, !pageFrom && styles.inputEmpty]}
                   value={pageFrom}
                   onChangeText={(text) => {
                     const cleaned = text.replace(/[^0-9]/g, '');
                     setPageFrom(cleaned);
                   }}
                   keyboardType="number-pad"
-                  placeholder="--"
-                  placeholderTextColor={colors.textSecondary}
+                  placeholder="مثال: 1"
+                  placeholderTextColor={colors.placeholder}
                   maxLength={3}
                   returnKeyType="next"
                 />
@@ -109,15 +109,15 @@ const PageSelectionScreen = ({ navigation }) => {
             <View style={styles.inputGroup}>
               <View style={styles.inputContainer}>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, !pageTo && styles.inputEmpty]}
                   value={pageTo}
                   onChangeText={(text) => {
                     const cleaned = text.replace(/[^0-9]/g, '');
                     setPageTo(cleaned);
                   }}
                   keyboardType="number-pad"
-                  placeholder="--"
-                  placeholderTextColor={colors.textSecondary}
+                  placeholder="مثال: 604"
+                  placeholderTextColor={colors.placeholder}
                   maxLength={3}
                   returnKeyType="done"
                 />
@@ -163,12 +163,12 @@ const PageSelectionScreen = ({ navigation }) => {
               عدد الأسئلة 
             </Text>
             <TextInput
-              style={styles.numberInput}
+              style={[styles.numberInput, !questionCount && styles.inputEmpty]}
               keyboardType="numeric"
               value={questionCount}
               onChangeText={setQuestionCount}
-              placeholder=" -- "
-              placeholderTextColor={colors.textSecondary}
+              placeholder="مثال: 10"
+              placeholderTextColor={colors.placeholder}
               textAlign="center"
             />
           </View>
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: colors.primary,
     paddingTop: 20,
-    paddingBottom: 30,
+    paddingBottom: 22,
     paddingHorizontal: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
@@ -261,7 +261,6 @@ const styles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 23,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 12,
@@ -274,29 +273,30 @@ const styles = StyleSheet.create({
   },
   headerContent: {
     flex: 1,
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    paddingRight: 58,
   },
   headerTitle: {
     fontSize: 25,
     fontWeight: '700',
     color: colors.textLight,
-    marginRight: 15,
+    textAlign: 'center',
     marginTop: 30,
   },
   scrollView: { 
     flex: 1
   },
   scrollViewContent: { 
-    paddingBottom: 30
+    paddingBottom: 20
   },
   content: { 
-    padding: 20
+    padding: 14
   },
   inputCard: {
     backgroundColor: colors.bgWhite, 
     borderRadius: 20, 
-    padding: 15, 
-    marginBottom: 15,
+    padding: 12, 
+    marginBottom: 10,
     shadowColor: colors.primary, 
     shadowOffset: { width: 0, height: 3 }, 
     shadowOpacity: 0.08,
@@ -311,8 +311,8 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: colors.bgLight, 
     borderRadius: 14, 
-    padding: 10, 
-    fontSize: 24,
+    padding: 6, 
+    fontSize: 22,
     textAlign: 'center', 
     color: colors.primary, 
     fontWeight: '700',
@@ -329,8 +329,8 @@ const styles = StyleSheet.create({
   separator: { 
     flexDirection: 'row', 
     alignItems: 'center', 
-    marginVertical: 20, 
-    gap: 12 
+    marginVertical: 8, 
+    gap: 8 
   },
   separatorLine: { 
     flex: 1, 
@@ -345,8 +345,8 @@ const styles = StyleSheet.create({
   pickerCard: {
     backgroundColor: colors.bgWhite, 
     borderRadius: 20, 
-    padding: 15, 
-    marginBottom: 20,
+    padding: 12, 
+    marginBottom: 10,
     shadowColor: colors.primary, 
     shadowOffset: { width: 0, height: 3 }, 
     shadowOpacity: 0.08,
@@ -359,13 +359,13 @@ const styles = StyleSheet.create({
     fontSize: 17, 
     fontWeight: '600', 
     color: colors.primary, 
-    marginBottom: 10, 
+    marginBottom: 2, 
     textAlign: 'right',
   },
   numberInput: {
     backgroundColor: colors.bgLight,
-    borderRadius: 14,
-    padding: 15,
+    borderRadius: 12,
+    padding: 5,
     fontSize: 20,
     color: colors.primary,
     borderWidth: 1,
@@ -376,8 +376,8 @@ const styles = StyleSheet.create({
   section: {
     backgroundColor: colors.bgWhite,
     borderRadius: 20,
-    padding: 15,
-    marginBottom: 15,
+    padding: 12,
+    marginBottom: 10,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.08,
@@ -390,18 +390,18 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     color: colors.primary,
-    marginBottom: 5,
+    marginBottom: 2,
     textAlign: 'right',
   },
   radioGroup: {
-    gap: 5,
+    gap: 3,
   },
   radioButton: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
     backgroundColor: colors.bgLight,
     borderRadius: 14,
-    padding: 10,
+    padding: 8,
     borderWidth: 2,
     borderColor: 'transparent',
   },
@@ -410,9 +410,9 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   radio: {
-    width: 24, 
-    height: 24, 
-    borderRadius: 12, 
+    width: 20, 
+    height: 20, 
+    borderRadius: 10, 
     borderWidth: 2, 
     borderColor: colors.textSecondary,
     justifyContent: 'center', 
@@ -423,9 +423,9 @@ const styles = StyleSheet.create({
     borderColor: colors.primary 
   },
   radioInner: { 
-    width: 12, 
-    height: 12, 
-    borderRadius: 6,
+    width: 10, 
+    height: 10, 
+    borderRadius: 5,
     backgroundColor: colors.primary 
   },
   radioText: {
@@ -442,8 +442,8 @@ const styles = StyleSheet.create({
   rangeInfoCard: {
     backgroundColor: colors.primaryLight, 
     borderRadius: 20, 
-    padding: 20, 
-    marginBottom: 20,
+    padding: 10, 
+    marginBottom: 10,
     borderWidth: 2, 
     borderColor: colors.secondary,
   },
@@ -466,10 +466,10 @@ const styles = StyleSheet.create({
   helpBox: {
     flexDirection: 'row-reverse', 
     backgroundColor: colors.bgWhite, 
-    padding: 16,
+    padding: 10,
     borderRadius: 16, 
-    marginBottom: 24, 
-    gap: 12, 
+    marginBottom: 12, 
+    gap: 8, 
     borderWidth: 1, 
     borderColor: colors.borderLight,
   },
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
   },
   startButton: {
     backgroundColor: colors.primary, 
-    paddingVertical: 18, 
+    paddingVertical: 12, 
     paddingHorizontal: 32,
     borderRadius: 18, 
     shadowColor: colors.primary, 
@@ -511,9 +511,13 @@ const styles = StyleSheet.create({
     elevation: 0 
   },
   startButtonText: { 
-    fontSize: 20, 
+    fontSize: 18, 
     fontWeight: '700', 
     color: colors.textLight 
+  },
+  inputEmpty: {
+    fontSize: 14,
+    fontWeight: '400',
   },
 });
 

@@ -10,6 +10,7 @@ export const colors = {
   textPrimary: '#1a2b1f',     
   textSecondary: '#4a5f54',    
   textLight: '#ffffff',     
+  placeholder: '#B5B5B5',
   
   border: '#d4c4a8',            
   borderLight: '#e8e4d8',  

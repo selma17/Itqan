@@ -10,10 +10,9 @@ import {
   Alert,
   TextInput,
   ToastAndroid, Platform,
-  Modal,
-  Pressable,
 } from 'react-native';
 import colors from '../styles/colors';
+import BottomSheetSelect from '../components/BottomSheetSelect';
 import quranData from '../data/quranData';
 
 const CustomTestSetupScreen = ({ navigation, route }) => {
@@ -26,11 +25,7 @@ const CustomTestSetupScreen = ({ navigation, route }) => {
   const [mode, setMode] = useState('random');
   const [versesToRead, setVersesToRead] = useState('');
 
-  const [currentSurah, setCurrentSurah] = useState('');
-  const [currentHizb, setCurrentHizb] = useState('');
   const [showSurahName, setShowSurahName] = useState(true);
-  const [surahMenuVisible, setSurahMenuVisible] = useState(false);
-  const [hizbMenuVisible, setHizbMenuVisible] = useState(false);
 
   useEffect(() => {
     if (autoStartParams?.autoStart) {
@@ -62,22 +57,8 @@ const CustomTestSetupScreen = ({ navigation, route }) => {
     setPageRanges(newRanges);
   };
 
-  const addSurah = (surahNumber) => {
-    if (surahNumber && !selectedSurahs.includes(parseInt(surahNumber))) {
-      setSelectedSurahs([...selectedSurahs, parseInt(surahNumber)]);
-      setCurrentSurah('');
-    }
-  };
-
   const removeSurah = (surahNumber) => {
     setSelectedSurahs(selectedSurahs.filter(s => s !== surahNumber));
-  };
-
-  const addHizb = (hizbNumber) => {
-    if (hizbNumber && !selectedHizbs.includes(parseInt(hizbNumber))) {
-      setSelectedHizbs([...selectedHizbs, parseInt(hizbNumber)]);
-      setCurrentHizb('');
-    }
   };
 
   const removeHizb = (hizbNumber) => {
@@ -89,17 +70,14 @@ const CustomTestSetupScreen = ({ navigation, route }) => {
     label: `الحزب ${i + 1}`
   }));
 
-  const currentSurahData = currentSurah
-    ? quranData.surahs.find(s => s.number === parseInt(currentSurah))
-    : null;
-
-  const currentSurahLabel = currentSurahData
-    ? `${currentSurahData.number}. ${currentSurahData.name}`
-    : 'اختر السورة';
-
-  const currentHizbLabel = currentHizb
-    ? `الحزب ${currentHizb}`
-    : 'اختر الحزب';
+  const surahOptions = quranData.surahs.map(surah => ({
+    value: surah.number,
+    label: surah.name,
+    badge: surah.number,
+    sub: `${surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية'} · ${surah.verses} آية`,
+    meta: `ص ${surah.page}`,
+  }));
+  const hizbOptions = hizbsList.map(h => ({ value: h.number, label: h.label, badge: h.number }));
 
   const showToast = (message) => {
     if (Platform.OS === 'android') {
@@ -265,58 +243,15 @@ const CustomTestSetupScreen = ({ navigation, route }) => {
 
           {sourceType === 'surahs' && (
             <View style={styles.pickerCard}>
-              <Text style={styles.label}>اختر السور:</Text>
-              
-              <View style={styles.pickerWrapper}>
-                <TouchableOpacity
-                  style={styles.picker}
-                  onPress={() => setSurahMenuVisible(true)}
-                  activeOpacity={0.7}>
-                  <Text style={styles.pickerArrow}>▼</Text>
-                  <Text
-                    style={[styles.pickerText, !currentSurahData && styles.pickerPlaceholder]}
-                    numberOfLines={1}>
-                    {currentSurahLabel}
-                  </Text>
-                </TouchableOpacity>
-                <View style={styles.pickerUnderline} />
-
-                <Modal
-                  visible={surahMenuVisible}
-                  transparent
-                  animationType="none"
-                  onRequestClose={() => setSurahMenuVisible(false)}>
-                  <Pressable
-                    style={styles.modalOverlay}
-                    onPress={() => setSurahMenuVisible(false)}>
-                    <Pressable style={styles.modalSheet}>
-                      <ScrollView>
-                        {quranData.surahs.map((surah) => {
-                          const isSelected = selectedSurahs.includes(surah.number);
-                          return (
-                            <TouchableOpacity
-                              key={surah.number}
-                              style={[styles.optionRow, isSelected && styles.optionRowSelected]}
-                              onPress={() => {
-                                const itemValue = surah.number.toString();
-                                setCurrentSurah(itemValue);
-                                addSurah(itemValue);
-                                setSurahMenuVisible(false);
-                              }}
-                              activeOpacity={0.6}>
-                              <Text
-                                style={[styles.optionText, isSelected && styles.optionTextSelected]}
-                                numberOfLines={1}>
-                                {`${surah.number}. ${surah.name}`}
-                              </Text>
-                            </TouchableOpacity>
-                          );
-                        })}
-                      </ScrollView>
-                    </Pressable>
-                  </Pressable>
-                </Modal>
-              </View>
+              <BottomSheetSelect
+                multiple
+                label="السور"
+                placeholder="اختر السور"
+                title="اختر السور"
+                options={surahOptions}
+                value={selectedSurahs}
+                onChange={setSelectedSurahs}
+              />
 
               {selectedSurahs.length > 0 && (
                 <View style={styles.selectedBadges}>
@@ -340,30 +275,29 @@ const CustomTestSetupScreen = ({ navigation, route }) => {
 
           {sourceType === 'pages' && (
             <View style={styles.pickerCard}>
-              <Text style={styles.label}>نطاقات الصفحات:</Text>
               {pageRanges.map((range, index) => (
                 <View key={index} style={styles.rangeRow}>
                   <View style={styles.rangeInputs}>
                     <View style={styles.inputGroup}>
                       <Text style={styles.inputLabel}>من</Text>
                       <TextInput
-                        style={styles.input}
+                        style={[styles.input, !range.from && styles.inputEmpty]}
                         keyboardType="numeric"
                         value={range.from}
                         onChangeText={(value) => handlePageRangeChange(index, 'from', value)}
-                        placeholder="---"
-                        placeholderTextColor={colors.textSecondary}
+                        placeholder="مثال: 1"
+                        placeholderTextColor={colors.placeholder}
                       />
                     </View>
                     <View style={styles.inputGroup}>
                       <Text style={styles.inputLabel}>إلى</Text>
                       <TextInput
-                        style={styles.input}
+                        style={[styles.input, !range.to && styles.inputEmpty]}
                         keyboardType="numeric"
                         value={range.to}
                         onChangeText={(value) => handlePageRangeChange(index, 'to', value)}
-                        placeholder="---"
-                        placeholderTextColor={colors.textSecondary}
+                        placeholder="مثال: 604"
+                        placeholderTextColor={colors.placeholder}
                       />
                     </View>
                   </View>
@@ -386,58 +320,15 @@ const CustomTestSetupScreen = ({ navigation, route }) => {
 
           {sourceType === 'hizbs' && (
             <View style={styles.pickerCard}>
-              <Text style={styles.label}>اختر الأحزاب:</Text>
-              
-              <View style={styles.pickerWrapper}>
-                <TouchableOpacity
-                  style={styles.picker}
-                  onPress={() => setHizbMenuVisible(true)}
-                  activeOpacity={0.7}>
-                  <Text style={styles.pickerArrow}>▼</Text>
-                  <Text
-                    style={[styles.pickerText, !currentHizb && styles.pickerPlaceholder]}
-                    numberOfLines={1}>
-                    {currentHizbLabel}
-                  </Text>
-                </TouchableOpacity>
-                <View style={styles.pickerUnderline} />
-
-                <Modal
-                  visible={hizbMenuVisible}
-                  transparent
-                  animationType="none"
-                  onRequestClose={() => setHizbMenuVisible(false)}>
-                  <Pressable
-                    style={styles.modalOverlay}
-                    onPress={() => setHizbMenuVisible(false)}>
-                    <Pressable style={styles.modalSheet}>
-                      <ScrollView>
-                        {hizbsList.map((hizb) => {
-                          const isSelected = selectedHizbs.includes(hizb.number);
-                          return (
-                            <TouchableOpacity
-                              key={hizb.number}
-                              style={[styles.optionRow, isSelected && styles.optionRowSelected]}
-                              onPress={() => {
-                                const itemValue = hizb.number.toString();
-                                setCurrentHizb(itemValue);
-                                addHizb(itemValue);
-                                setHizbMenuVisible(false);
-                              }}
-                              activeOpacity={0.6}>
-                              <Text
-                                style={[styles.optionText, isSelected && styles.optionTextSelected]}
-                                numberOfLines={1}>
-                                {hizb.label}
-                              </Text>
-                            </TouchableOpacity>
-                          );
-                        })}
-                      </ScrollView>
-                    </Pressable>
-                  </Pressable>
-                </Modal>
-              </View>
+              <BottomSheetSelect
+                multiple
+                label="الأحزاب"
+                placeholder="اختر الأحزاب"
+                title="اختر الأحزاب"
+                options={hizbOptions}
+                value={selectedHizbs}
+                onChange={setSelectedHizbs}
+              />
 
               {selectedHizbs.length > 0 && (
                 <View style={styles.selectedBadges}>
@@ -459,11 +350,12 @@ const CustomTestSetupScreen = ({ navigation, route }) => {
           <View style={styles.pickerCard}>
             <Text style={styles.label}>عدد الأسئلة</Text>
             <TextInput
-              style={styles.numberInput}
+              style={[styles.numberInput, !questionCount && styles.inputEmpty]}
               keyboardType="numeric"
+              value={questionCount}
               onChangeText={setQuestionCount}
-              placeholder="--"
-              placeholderTextColor={colors.textSecondary}
+              placeholder="مثال: 10"
+              placeholderTextColor={colors.placeholder}
             />
           </View>
 
@@ -503,12 +395,12 @@ const CustomTestSetupScreen = ({ navigation, route }) => {
             <Text style={styles.label}>عدد الآيات للقراءة</Text>
             <TextInput
               value={versesToRead}
-              style={styles.numberInput}
+              style={[styles.numberInput, !versesToRead && styles.inputEmpty]}
               keyboardType="numeric"
               onChangeText={setVersesToRead}
               onFocus={handleVersesToReadFocus}
-              placeholder="--"
-              placeholderTextColor={colors.textSecondary}
+              placeholder="مثال: 3"
+              placeholderTextColor={colors.placeholder}
             />
           </View>
 
@@ -558,7 +450,7 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: colors.primary,
     paddingTop: 20,
-    paddingBottom: 30,
+    paddingBottom: 22,
     paddingHorizontal: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
@@ -575,7 +467,6 @@ const styles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 23,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 12,
@@ -588,7 +479,8 @@ const styles = StyleSheet.create({
   },
   headerContent: {
     flex: 1,
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    paddingRight: 58,
   },
   headerTitle: {
     fontSize: 22,
@@ -596,19 +488,19 @@ const styles = StyleSheet.create({
     color: colors.secondary,
     marginBottom: 4,
     marginTop: 35,
-    marginRight: 15
+    textAlign: 'center',
   },
   scrollView: {
     flex: 1,
   },
   content: {
-    padding: 25,
+    padding: 14,
   },
   section: {
     backgroundColor: colors.bgWhite,
     borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
+    padding: 12,
+    marginBottom: 10,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.08,
@@ -621,30 +513,30 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     color: colors.primary,
-    marginBottom: 10,
+    marginBottom: 3,
     textAlign: 'right',
   },
   radioGroup: {
-    gap: 8,
+    gap: 3,
   },
   radioButton: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    padding: 10,
+    padding: 8,
     borderRadius: 14,
     borderWidth: 2,
     borderColor: colors.borderLight,
     backgroundColor: colors.bgLight,
-    gap: 12,
+    gap: 10,
   },
   radioButtonActive: {
     borderColor: colors.secondary,
     backgroundColor: colors.primaryLight,
   },
   radio: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     borderWidth: 2,
     borderColor: colors.border,
     justifyContent: 'center',
@@ -654,9 +546,9 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
   },
   radioInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     backgroundColor: colors.primary,
   },
   radioText: {
@@ -672,8 +564,8 @@ const styles = StyleSheet.create({
   pickerCard: {
     backgroundColor: colors.bgWhite,
     borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
+    padding: 12,
+    marginBottom: 10,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.08,
@@ -686,115 +578,48 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     color: colors.primary,
-    marginBottom: 10,
+    marginBottom: 3,
     textAlign: 'right',
-  },
-  pickerWrapper: {
-    position: 'relative',
-  },
-  picker: {
-    backgroundColor: colors.bgLight,
-    borderRadius: 12,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-  },
-  pickerText: {
-    flex: 1,
-    fontSize: 16,
-    color: '#2C2C2C',
-    textAlign: 'right',
-    writingDirection: 'rtl',
-    marginRight: 8,
-  },
-  pickerPlaceholder: {
-    color: '#9E9E9E',
-  },
-  pickerArrow: {
-    fontSize: 12,
-    color: colors.primary,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.35)',
-    justifyContent: 'center',
-    padding: 30,
-  },
-  modalSheet: {
-    backgroundColor: colors.bgWhite,
-    borderRadius: 16,
-    maxHeight: '70%',
-    overflow: 'hidden',
-  },
-  optionRow: {
-    paddingVertical: 14,
-    paddingHorizontal: 18,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
-  },
-  optionRowSelected: {
-    backgroundColor: colors.primaryLight,
-  },
-  optionText: {
-    fontSize: 16,
-    color: '#2C2C2C',
-    textAlign: 'right',
-    writingDirection: 'rtl',
-  },
-  optionTextSelected: {
-    color: colors.primary,
-    fontWeight: '700',
-  },
-  pickerUnderline: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 2,
-    backgroundColor: colors.secondary,
-    borderRadius: 1,
   },
   selectedBadges: {
     flexDirection: 'row-reverse',
     flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 16,
+    gap: 6,
+    marginTop: 8,
   },
   selectedBadge: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
     backgroundColor: colors.primaryLight,
-    borderRadius: 20,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    gap: 6,
-    borderWidth: 2,
+    borderRadius: 14,
+    paddingVertical: 2,
+    paddingHorizontal: 7,
+    gap: 4,
+    borderWidth: 1.5,
     borderColor: colors.secondary,
   },
   badgeText: {
-    fontSize: 14,
+    fontSize: 12,
     color: colors.primary,
     fontWeight: '600',
   },
   badgeRemove: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   badgeRemoveText: {
-    fontSize: 12,
+    fontSize: 9,
     color: colors.textLight,
     fontWeight: 'bold',
   },
   rangeRow: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 6,
     gap: 8,
   },
   rangeInputs: {
@@ -804,14 +629,17 @@ const styles = StyleSheet.create({
   },
   inputGroup: {
     flex: 1,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 6,
   },
   inputLabel: {
     fontSize: 14,
     color: colors.textSecondary,
-    marginBottom: 1,
     textAlign: 'right',
   },
   input: {
+    flex: 1,
     backgroundColor: colors.bgLight,
     borderRadius: 12,
     padding: 7,
@@ -822,22 +650,21 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   removeButton: {
-    width: 25,
-    height: 25,
-    borderRadius: 20,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
     backgroundColor: colors.error,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
   },
   removeButtonText: {
-    fontSize: 15,
+    fontSize: 11,
     color: colors.textLight,
     fontWeight: 'bold',
   },
   addButton: {
     backgroundColor: colors.primaryLight,
-    padding: 10,
+    padding: 7,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 4,
@@ -849,8 +676,8 @@ const styles = StyleSheet.create({
   },
   numberInput: {
     backgroundColor: colors.bgLight,
-    borderRadius: 14,
-    padding: 10,
+    borderRadius: 12,
+    padding: 5,
     fontSize: 20,
     textAlign: 'center',
     borderWidth: 1,
@@ -860,7 +687,7 @@ const styles = StyleSheet.create({
   },
   startButton: {
     backgroundColor: colors.primary,
-    paddingVertical: 15,
+    paddingVertical: 11,
     paddingHorizontal: 32,
     borderRadius: 18,
     shadowColor: colors.primary,
@@ -874,9 +701,13 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   startButtonText: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     color: colors.secondary,
+  },
+  inputEmpty: {
+    fontSize: 14,
+    fontWeight: '400',
   },
 });
 
