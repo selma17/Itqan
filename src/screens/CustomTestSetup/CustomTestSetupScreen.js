@@ -24,8 +24,8 @@ const MODE_OPTIONS = [
   { value: 'random', label: 'عشوائي (بدون ترتيب)' },
 ];
 
-const CustomTestSetupScreen = ({ navigation, route }) => {
-  const setup = useCustomTestSetup(navigation, route);
+const CustomTestSetupScreen = ({ navigation }) => {
+  const setup = useCustomTestSetup(navigation);
   const { form, sourceType } = setup;
 
   return (

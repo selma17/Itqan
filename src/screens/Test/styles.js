@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import colors from '../../styles/colors';
-import { wp, hp, SPACING, FONT_SIZES, RADIUS } from '../../utils/responsive';
+import { wp, hp, SPACING, FONT_SIZES, RADIUS, CONTENT_MAX_WIDTH } from '../../utils/responsive';
 
 export default StyleSheet.create({
   container: {
@@ -9,9 +9,15 @@ export default StyleSheet.create({
   },
   mainContent: {
     flex: 1,
+    width: '100%',
+    maxWidth: CONTENT_MAX_WIDTH,
+    alignSelf: 'center',
     padding: SPACING.md,
   },
   controlsContainer: {
+    width: '100%',
+    maxWidth: CONTENT_MAX_WIDTH,
+    alignSelf: 'center',
     backgroundColor: colors.bgWhite,
     padding: SPACING.md,
     borderTopWidth: 1,

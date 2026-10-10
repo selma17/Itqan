@@ -26,6 +26,8 @@ const useTestSession = (navigation, route) => {
 
   // Versets déjà posés (mode sans nombre de questions défini) pour éviter les répétitions.
   const usedVersesRef = useRef(new Set());
+  // Les questions ne sont générées qu'une fois (un rechargement de riwaya ne doit pas les réinitialiser).
+  const generatedRef = useRef(false);
 
   const testVerses = useMemo(
     () => (quranData ? getTestVerses(quranData, params) : []),
@@ -34,7 +36,7 @@ const useTestSession = (navigation, route) => {
 
   // Génération des questions au démarrage
   useEffect(() => {
-    if (!quranData) return;
+    if (!quranData || generatedRef.current) return;
 
     try {
       if (testVerses.length === 0) {
@@ -49,12 +51,13 @@ const useTestSession = (navigation, route) => {
         if (questions.length > 0) setCurrentVerse(questions[0]);
       } else {
         const first = pickRandom(testVerses);
-        setAllQuestions(testVerses);
         setCurrentVerse(first);
         usedVersesRef.current = new Set([getVerseKey(first)]);
       }
+      generatedRef.current = true;
       setLoading(false);
     } catch (error) {
+      console.error('Erreur génération des questions:', error);
       Alert.alert('خطأ', 'حدث خطأ أثناء تحميل الأسئلة');
       setLoading(false);
     }

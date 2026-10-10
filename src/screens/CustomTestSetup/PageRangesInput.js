@@ -8,7 +8,8 @@ const RangeField = ({ label, value, placeholder, onChange }) => (
     <Text style={styles.inputLabel}>{label}</Text>
     <TextInput
       style={[styles.input, !value && styles.inputEmpty]}
-      keyboardType="numeric"
+      keyboardType="number-pad"
+      maxLength={3}
       value={value}
       onChangeText={onChange}
       placeholder={placeholder}

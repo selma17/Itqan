@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Alert } from 'react-native';
 import quranData from '../../data/quranData';
 import useTestSetupForm from '../../hooks/useTestSetupForm';
@@ -11,8 +11,7 @@ const APPROX_VERSES_PER_HIZB = 20;
 const EMPTY_RANGE = { from: '', to: '' };
 const hasBothBounds = (range) => range.from && range.to;
 
-const useCustomTestSetup = (navigation, route) => {
-  const autoStartParams = route.params;
+const useCustomTestSetup = (navigation) => {
   const form = useTestSetupForm({ defaultQuestionCount: '10' });
 
   const [sourceType, setSourceType] = useState('surahs');
@@ -21,20 +20,6 @@ const useCustomTestSetup = (navigation, route) => {
   const [selectedHizbs, setSelectedHizbs] = useState([]);
   const [versesToRead, setVersesToRead] = useState('');
 
-  // Relance directe d'un test sauvegardé
-  useEffect(() => {
-    if (autoStartParams?.autoStart) {
-      navigation.replace('CustomTest', {
-        sourceType: autoStartParams.sourceType,
-        selectedSurahs: autoStartParams.selectedSurahs,
-        pageRanges: autoStartParams.pageRanges,
-        selectedHizbs: autoStartParams.selectedHizbs,
-        mode: autoStartParams.mode,
-        versesToRead: autoStartParams.versesToRead,
-      });
-    }
-  }, [autoStartParams, navigation]);
-
   // ── Plages de pages ──
   const addPageRange = () => setPageRanges(ranges => [...ranges, EMPTY_RANGE]);
 
@@ -42,7 +27,9 @@ const useCustomTestSetup = (navigation, route) => {
     setPageRanges(ranges => (ranges.length > 1 ? ranges.filter((_, i) => i !== index) : ranges));
 
   const changePageRange = (index, field, value) =>
-    setPageRanges(ranges => ranges.map((r, i) => (i === index ? { ...r, [field]: value } : r)));
+    setPageRanges(ranges =>
+      ranges.map((r, i) => (i === index ? { ...r, [field]: value.replace(/[^0-9]/g, '') } : r))
+    );
 
   // ── Sélections ──
   const removeSurah = (surahNumber) => setSelectedSurahs(list => list.filter(s => s !== surahNumber));
@@ -106,7 +93,7 @@ const useCustomTestSetup = (navigation, route) => {
       const invalid = validRanges.some(r => {
         const from = parseInt(r.from, 10);
         const to = parseInt(r.to, 10);
-        return from > to || from < 1 || to > 604;
+        return !from || !to || from > to || from < 1 || to > 604;
       });
       if (invalid) return ['خطأ', 'نطاق الصفحات غير صحيح (1-604)'];
     }

@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import colors from '../../styles/colors';
 import { useQuran } from '../../context/QuranContext';
-import { getJSON, setJSON, STORAGE_KEYS } from '../../services/storage';
+import { setJSON, STORAGE_KEYS } from '../../services/storage';
 import { formatDuration } from '../../utils/format';
 import { buildSurahNames, getHizbLabel, getPageSurahs, getPerformance } from './sourceInfo';
 
@@ -66,16 +66,6 @@ const useCustomResults = (navigation, route) => {
       }))
     : [];
 
-  const retryTest = async () => {
-    try {
-      const saved = await getJSON(STORAGE_KEYS.LAST_TEST_PARAMS);
-      if (saved) navigation.navigate('Duaa', saved);
-    } catch (error) {
-      console.error('Erreur lors de la récupération des paramètres:', error);
-      navigation.navigate('Duaa', testParams);
-    }
-  };
-
   return {
     score,
     errors,
@@ -88,7 +78,7 @@ const useCustomResults = (navigation, route) => {
     pageRangeDetails,
     modeLabel: mode === 'sequential' ? 'متسلسل' : 'عشوائي',
     durationLabel: formatDuration(duration),
-    retryTest,
+    retryTest: () => navigation.navigate('Duaa', testParams),
     newTest: () => navigation.navigate('CustomTestSetup'),
     backToTests: () => navigation.navigate('Tests'),
   };

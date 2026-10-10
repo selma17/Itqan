@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import colors from '../../styles/colors';
-import { wp, hp, SPACING, FONT_SIZES, RADIUS } from '../../utils/responsive';
+import { wp, hp, SPACING, FONT_SIZES, RADIUS, CONTENT_MAX_WIDTH } from '../../utils/responsive';
 
 const GOLD_LIGHT = '#F4E4C1';
 
@@ -11,6 +11,9 @@ export default StyleSheet.create({
   },
   mainContent: {
     flex: 1,
+    width: '100%',
+    maxWidth: CONTENT_MAX_WIDTH,
+    alignSelf: 'center',
     padding: SPACING.sm,
   },
   progressBar: {
@@ -31,6 +34,9 @@ export default StyleSheet.create({
     textAlign: 'center',
   },
   controlsContainer: {
+    width: '100%',
+    maxWidth: CONTENT_MAX_WIDTH,
+    alignSelf: 'center',
     backgroundColor: colors.bgWhite,
     borderTopWidth: 2,
     borderTopColor: GOLD_LIGHT,

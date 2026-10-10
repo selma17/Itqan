@@ -11,9 +11,13 @@ const useVerseFontSize = () => {
   const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE);
 
   useEffect(() => {
-    getItem(STORAGE_KEYS.VERSE_FONT_STEP).then(val => {
-      if (val !== null) setFontSize(VERSE_FONT_SIZES[Number(val)] ?? DEFAULT_FONT_SIZE);
-    });
+    let active = true;
+    getItem(STORAGE_KEYS.VERSE_FONT_STEP)
+      .then(val => {
+        if (active && val !== null) setFontSize(VERSE_FONT_SIZES[Number(val)] ?? DEFAULT_FONT_SIZE);
+      })
+      .catch(() => {});
+    return () => { active = false; };
   }, []);
 
   return fontSize;

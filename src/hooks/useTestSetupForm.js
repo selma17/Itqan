@@ -33,7 +33,7 @@ const useTestSetupForm = ({ defaultShowSurahName = true, defaultQuestionCount = 
   };
 
   const getDisabledLabel = (selectionLabel) =>
-    mode === QUESTION_ORDER.SEQUENTIAL && !questionCount ? 'حدد عدد الأسئلة' : selectionLabel;
+    isCountMissing ? 'حدد عدد الأسئلة' : selectionLabel;
 
   // Paramètres communs à passer à l'écran suivant.
   const getCommonParams = () => ({
